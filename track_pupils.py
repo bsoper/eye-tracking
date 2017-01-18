@@ -37,12 +37,20 @@ if __name__ == '__main__':
     if eye_cascade.empty():
         print "did not load eye classifier"
     
-    cap = cv2.VideoCapture('/Users/bsoper/Movies/eye_tracking/face.mov')
-    
+    #cap = cv2.VideoCapture('/Users/bsoper/Movies/eye_tracking/face.mov')
+    cap = cv2.VideoCapture(0)
+
     while(cap.isOpened()):
+        
         # pull video frame
         ret, img = cap.read()
+        #img = cv2.flip(img,1)
+        cv2.imshow('frame', img)
 
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            cv2.imwrite('bad_eye.jpg', img)
+            break
+        """
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             
         # get faces
@@ -78,7 +86,7 @@ if __name__ == '__main__':
         if cv2.waitKey(1) & 0xFF == ord('q'):
             cv2.imwrite('bad_eye.jpg', img)
             break
-        
+        """
 
 # cleanup        
 cap.release()
