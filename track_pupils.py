@@ -44,7 +44,7 @@ if __name__ == '__main__':
         
         # pull video frame
         ret, img = cap.read()
-        #img = cv2.flip(img,1)
+        img = cv2.flip(img,1)
         cv2.imshow('frame', img)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
