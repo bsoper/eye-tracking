@@ -59,7 +59,9 @@ if __name__ == '__main__':
             
             #eyes = eye_cascade.detectMultiScale(gray_face) # locate eye regions
             eyes = eye_cascade.detectMultiScale(gray_face, 3.0, 5) # locate eye regions
-
+            
+            if len(eyes) == 0:
+                continue
 
             #cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)                              #####
             #color_face = img[y:y+h, x:x+w]                                              #####
@@ -67,11 +69,11 @@ if __name__ == '__main__':
             #    cv2.rectangle(color_face,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)             #####
             
 
-
+            pupil_avg = [0,0]
             #"""
             for (ex,ey,ew,eh) in eyes:
                 gray_eye = gray_face[ey:ey+eh, ex:ex+ew] # get eye
-                eye = face[ey:ey+eh, ex:ex+ew]
+                #eye = face[ey:ey+eh, ex:ex+ew]
                 
                 # apply gaussian blur to image
                 blur = cv2.GaussianBlur(gray_eye, (15,15), 3*gray_eye.shape[0])
@@ -86,8 +88,15 @@ if __name__ == '__main__':
                 pupil = findEyeCenter(gray_eye, thresh)
                 
                 #cv2.circle(eye, pupil, 0, (0,255,0), -1)
-                cv2.circle(img, (pupil[1] + ex + x, pupil[0] + ey + y), 2, (0,255,0), -1)
+                
+                #cv2.circle(img, (pupil[1] + ex + x, pupil[0] + ey + y), 2, (0,255,0), -1)
+
+                pupil_avg[0] += pupil[1] + ex + x;
+                pupil_avg[1] += pupil[0] + ey + y;
             #"""
+
+            pupil_avg = [x / len(eyes) for x in pupil_avg]
+            cv2.circle(img, (pupil_avg[0], pupil_avg[1]), 2, (0,255,0), -1)
         
         cv2.imshow('frame', img)
         
