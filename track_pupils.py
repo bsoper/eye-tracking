@@ -45,12 +45,8 @@ if __name__ == '__main__':
         # pull video frame
         ret, img = cap.read()
         img = cv2.flip(img,1)
-        cv2.imshow('frame', img)
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            cv2.imwrite('bad_eye.jpg', img)
-            break
-        """
+        
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             
         # get faces
@@ -61,7 +57,18 @@ if __name__ == '__main__':
             gray_face = gray[y:y+h, x:x+w]
             face = img[y:y+h, x:x+w]
             
-            eyes = eye_cascade.detectMultiScale(gray_face) # locate eye regions
+            #eyes = eye_cascade.detectMultiScale(gray_face) # locate eye regions
+            eyes = eye_cascade.detectMultiScale(gray_face, 3.0, 5) # locate eye regions
+
+
+            #cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)                              #####
+            #color_face = img[y:y+h, x:x+w]                                              #####
+            #for (ex,ey,ew,eh) in eyes:                                                  #####
+            #    cv2.rectangle(color_face,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)             #####
+            
+
+
+            #"""
             for (ex,ey,ew,eh) in eyes:
                 gray_eye = gray_face[ey:ey+eh, ex:ex+ew] # get eye
                 eye = face[ey:ey+eh, ex:ex+ew]
@@ -80,13 +87,13 @@ if __name__ == '__main__':
                 
                 #cv2.circle(eye, pupil, 0, (0,255,0), -1)
                 cv2.circle(img, (pupil[1] + ex + x, pupil[0] + ey + y), 2, (0,255,0), -1)
+            #"""
         
         cv2.imshow('frame', img)
         
         if cv2.waitKey(1) & 0xFF == ord('q'):
             cv2.imwrite('bad_eye.jpg', img)
             break
-        """
 
 # cleanup        
 cap.release()
