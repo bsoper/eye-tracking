@@ -42,9 +42,6 @@ if __name__ == '__main__':
 
     while(cap.isOpened()):
 
-        #Allow us to exit frame without having to force quit program
-
-
         # pull video frame
         ret, img = cap.read()
         img = cv2.flip(img,1)
