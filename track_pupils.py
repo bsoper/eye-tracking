@@ -1,4 +1,5 @@
 import cv2 
+import collections
 
 def findEyeCenter(gray_eye, thresh_eye):
     """ findEyeCenter: approximates the center of the pupil by selecting
@@ -37,12 +38,14 @@ if __name__ == '__main__':
     if eye_cascade.empty():
         print "did not load eye classifier"
     
-    cap = cv2.VideoCapture('/Users/bsoper/Movies/eye_tracking/cal_1.mov')
-    #cap = cv2.VideoCapture(0)
+    #cap = cv2.VideoCapture('/Users/bsoper/Movies/eye_tracking/cal_1.mov')
+    cap = cv2.VideoCapture(0)
 
     #center_count = 0
     have_center = False
     center = [0,0]
+
+    rolling_pupil_avg = collections.deque(maxlen=5)
 
     while(cap.isOpened()):
         
@@ -66,9 +69,10 @@ if __name__ == '__main__':
             #eyes = eye_cascade.detectMultiScale(gray_face) # locate eye regions
             eyes = eye_cascade.detectMultiScale(gray_face, 3.0, 5) # locate eye regions
             
-            if len(eyes) == 0:
+            if len(eyes) != 2:
                 continue
 
+            # Uncomment to add boxes around face and eyes.
             #cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)                              #####
             #color_face = img[y:y+h, x:x+w]                                              #####
             #for (ex,ey,ew,eh) in eyes:                                                  #####
@@ -94,7 +98,7 @@ if __name__ == '__main__':
                 
                 #cv2.circle(eye, pupil, 0, (0,255,0), -1)
                 
-                #cv2.circle(img, (pupil[1] + ex + x, pupil[0] + ey + y), 2, (0,255,0), -1)
+                cv2.circle(img, (pupil[1] + ex + x, pupil[0] + ey + y), 2, (0,255,0), -1)
 
                 pupil_avg[0] += pupil[1] + ex + x;
                 pupil_avg[1] += pupil[0] + ey + y;
@@ -108,9 +112,20 @@ if __name__ == '__main__':
             #cv2.circle(img, (pupil_avg[0], pupil_avg[1]), 2, (0,255,0), -1)
             if have_center:
                 cv2.circle(img, (center[0], center[1]), 2, (255,0,0), -1)
-            x = center[0] + (pupil_avg[0] - center[0]) * 25
-            y = center[1] + (pupil_avg[1] - center[1]) * 25
-            cv2.circle(img, (x, y), 2, (0,255,0), -1)
+            x_scaled = center[0] + (pupil_avg[0] - center[0]) * 40
+            y_scaled = center[1] + (pupil_avg[1] - center[1]) * 40
+
+            rolling_pupil_avg.appendleft((x_scaled, y_scaled))
+            
+            avgs = (sum(a) for a in zip(*rolling_pupil_avg))
+            avgs = [a / len(rolling_pupil_avg) for a in avgs]
+
+            cv2.circle(img, (avgs[0], avgs[1]), 2, (0,0,255), -1)
+
+            # Uncomment to show unscaled movement of average.
+            #x = center[0] + (pupil_avg[0] - center[0])
+            #y = center[1] + (pupil_avg[1] - center[1])
+            #cv2.circle(img, (x, y), 2, (0,255,0), -1)
         
         """
         if center_count < 5:
