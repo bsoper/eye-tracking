@@ -23,6 +23,31 @@ def findEyeCenter(gray_eye, thresh_eye):
                     pupil[1] = j
     
     return pupil
+
+def getPupilAvgFromFace(gray_face, eyes, x, y, w, h):
+    pupil_avg = [0,0]
+    for (ex,ey,ew,eh) in eyes:                
+        gray_eye = gray_face[ey:ey+eh, ex:ex+ew] # get eye
+        #eye = face[ey:ey+eh, ex:ex+ew]
+        
+        # apply gaussian blur to image
+        blur = cv2.GaussianBlur(gray_eye, (15,15), 3*gray_eye.shape[0])
+        retval, thresh = cv2.threshold(~blur, 150, 255, cv2.THRESH_BINARY) 
+        contours, hierarchy = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cv2.drawContours(thresh, contours, -1, (255, 255, 255), -1)
+        #circles = cv2.HoughCircles(thresh, cv2.cv.CV_HOUGH_GRADIENT, 1, 1) 
+        pupil = findEyeCenter(gray_eye, thresh)
+
+        # Uncomment to highlight individual pupils.
+        #cv2.circle(img, (pupil[1] + ex + x, pupil[0] + ey + y), 2, (0,255,0), -1)
+
+        pupil_avg[0] += pupil[1] + ex + x;
+        pupil_avg[1] += pupil[0] + ey + y;
+
+    # Compute pupil average
+    pupil_avg = [x / len(eyes) for x in pupil_avg]
+    
+    return pupil_avg
     
 #
 ## main function
@@ -34,17 +59,15 @@ if __name__ == '__main__':
     
     if face_cascade.empty():
         print "did not load classifier"
-        
     if eye_cascade.empty():
         print "did not load eye classifier"
     
-    #cap = cv2.VideoCapture('/Users/bsoper/Movies/eye_tracking/cal_1.mov')
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture('/Users/bsoper/Movies/eye_tracking/cal_1.mov')
+    #cap = cv2.VideoCapture(0)
 
     #center_count = 0
     have_center = False
     center = [0,0]
-
     rolling_pupil_avg = collections.deque(maxlen=5)
 
     while(cap.isOpened()):
@@ -59,8 +82,6 @@ if __name__ == '__main__':
         # get faces
         faces = face_cascade.detectMultiScale(img, 1.3, 5)
         
-        pupil_avg = [0,0]
-
         for (x,y,w,h) in faces:
             # pull face sub-image
             gray_face = gray[y:y+h, x:x+w]
@@ -77,39 +98,14 @@ if __name__ == '__main__':
             #color_face = img[y:y+h, x:x+w]                                              #####
             #for (ex,ey,ew,eh) in eyes:                                                  #####
             #    cv2.rectangle(color_face,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)             #####
-            
 
-            #"""
-            for (ex,ey,ew,eh) in eyes:
-                gray_eye = gray_face[ey:ey+eh, ex:ex+ew] # get eye
-                #eye = face[ey:ey+eh, ex:ex+ew]
-                
-                # apply gaussian blur to image
-                blur = cv2.GaussianBlur(gray_eye, (15,15), 3*gray_eye.shape[0])
-                
-                retval, thresh = cv2.threshold(~blur, 150, 255, cv2.THRESH_BINARY)
-                
-                contours, hierarchy = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-                
-                cv2.drawContours(thresh, contours, -1, (255, 255, 255), -1)
-                #circles = cv2.HoughCircles(thresh, cv2.cv.CV_HOUGH_GRADIENT, 1, 1) 
-                
-                pupil = findEyeCenter(gray_eye, thresh)
-                
-                #cv2.circle(eye, pupil, 0, (0,255,0), -1)
-                
-                cv2.circle(img, (pupil[1] + ex + x, pupil[0] + ey + y), 2, (0,255,0), -1)
+            pupil_avg = getPupilAvgFromFace(gray_face, eyes, x, y, w, h)
 
-                pupil_avg[0] += pupil[1] + ex + x;
-                pupil_avg[1] += pupil[0] + ey + y;
-            #"""
-
-            pupil_avg = [x / len(eyes) for x in pupil_avg]
             if have_center == False:
                 center = pupil_avg
                 have_center = True
 
-            #cv2.circle(img, (pupil_avg[0], pupil_avg[1]), 2, (0,255,0), -1)
+            # Highlight center.
             if have_center:
                 cv2.circle(img, (center[0], center[1]), 2, (255,0,0), -1)
             x_scaled = center[0] + (pupil_avg[0] - center[0]) * 40
@@ -126,17 +122,7 @@ if __name__ == '__main__':
             #x = center[0] + (pupil_avg[0] - center[0])
             #y = center[1] + (pupil_avg[1] - center[1])
             #cv2.circle(img, (x, y), 2, (0,255,0), -1)
-        
-        """
-        if center_count < 5:
-            center[0] += pupil_avg[0]
-            center[1] += pupil_avg[1]
-            center_count += 1
-        elif center_count == 5:
-            center = [x / 5 for x in center]
-            print center
-            center_count += 1
-        """
+
         cv2.imshow('frame', img)
         
         if cv2.waitKey(1) & 0xFF == ord('q'):
