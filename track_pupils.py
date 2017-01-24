@@ -32,7 +32,7 @@ if __name__ == '__main__':
     eye_cascade = cv2.CascadeClassifier('haarcascade_eye.xml')
 
     if face_cascade.empty():
-        print "did not load classifier"
+        print "did not load face classifier"
 
     if eye_cascade.empty():
         print "did not load eye classifier"
@@ -46,11 +46,13 @@ if __name__ == '__main__':
         ret, img = cap.read()
         img = cv2.flip(img,1)
 
-
+        #Greyscale
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
         # get faces
-        faces = face_cascade.detectMultiScale(img, 1.3, 5)
+        face_scale_factor = 1.3
+        face_min_neighbors = 5
+        faces = face_cascade.detectMultiScale(img, face_scale_factor, face_min_neighbors)
 
         for (x,y,w,h) in faces:
             # pull face sub-image
@@ -58,7 +60,11 @@ if __name__ == '__main__':
             face = img[y:y+h, x:x+w]
 
             #eyes = eye_cascade.detectMultiScale(gray_face) # locate eye regions
-            eyes = eye_cascade.detectMultiScale(gray_face, 3.0, 5) # locate eye regions
+            eye_scale_factor = 3.0
+            eye_min_neighbors = 5
+
+            #Locate Eye Regions
+            eyes = eye_cascade.detectMultiScale(gray_face, eye_scale_factor, eye_min_neighbors)
 
             if len(eyes) == 0:
                 continue
@@ -96,7 +102,10 @@ if __name__ == '__main__':
             #"""
 
             pupil_avg = [x / len(eyes) for x in pupil_avg]
-            cv2.circle(img, (pupil_avg[0], pupil_avg[1]), 2, (0,255,0), -1)
+
+            #Plot pupil on screen
+            pupil_color = (0,255,0)
+            cv2.circle(img, (pupil_avg[0], pupil_avg[1]), 2, pupil_color, -1)
 
         cv2.imshow('frame', img)
 
