@@ -37,8 +37,12 @@ if __name__ == '__main__':
     if eye_cascade.empty():
         print "did not load eye classifier"
     
-    #cap = cv2.VideoCapture('/Users/bsoper/Movies/eye_tracking/face.mov')
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture('/Users/bsoper/Movies/eye_tracking/cal_1.mov')
+    #cap = cv2.VideoCapture(0)
+
+    #center_count = 0
+    have_center = False
+    center = [0,0]
 
     while(cap.isOpened()):
         
@@ -52,6 +56,8 @@ if __name__ == '__main__':
         # get faces
         faces = face_cascade.detectMultiScale(img, 1.3, 5)
         
+        pupil_avg = [0,0]
+
         for (x,y,w,h) in faces:
             # pull face sub-image
             gray_face = gray[y:y+h, x:x+w]
@@ -69,7 +75,6 @@ if __name__ == '__main__':
             #    cv2.rectangle(color_face,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)             #####
             
 
-            pupil_avg = [0,0]
             #"""
             for (ex,ey,ew,eh) in eyes:
                 gray_eye = gray_face[ey:ey+eh, ex:ex+ew] # get eye
@@ -96,8 +101,27 @@ if __name__ == '__main__':
             #"""
 
             pupil_avg = [x / len(eyes) for x in pupil_avg]
-            cv2.circle(img, (pupil_avg[0], pupil_avg[1]), 2, (0,255,0), -1)
+            if have_center == False:
+                center = pupil_avg
+                have_center = True
+
+            #cv2.circle(img, (pupil_avg[0], pupil_avg[1]), 2, (0,255,0), -1)
+            if have_center:
+                cv2.circle(img, (center[0], center[1]), 2, (255,0,0), -1)
+            x = center[0] + (pupil_avg[0] - center[0]) * 25
+            y = center[1] + (pupil_avg[1] - center[1]) * 25
+            cv2.circle(img, (x, y), 2, (0,255,0), -1)
         
+        """
+        if center_count < 5:
+            center[0] += pupil_avg[0]
+            center[1] += pupil_avg[1]
+            center_count += 1
+        elif center_count == 5:
+            center = [x / 5 for x in center]
+            print center
+            center_count += 1
+        """
         cv2.imshow('frame', img)
         
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -107,4 +131,3 @@ if __name__ == '__main__':
 # cleanup        
 cap.release()
 cv2.destroyAllWindows()
-
