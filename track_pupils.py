@@ -25,6 +25,11 @@ def findEyeCenter(gray_eye, thresh_eye):
     return pupil
 
 def getPupilAvgFromFace(gray_face, eyes, x, y, w, h):
+    """
+    getPupilAvgFromFace(gray_face, eyes, x, y, w, h): Takes a grey version of face image,
+    a list of eyes, and the x, y, w, h, coordinates of the face. Returns a list [x, y] for 
+    the average between the eyes contained in the list.
+    """
     pupil_avg = [0,0]
     for (ex,ey,ew,eh) in eyes:                
         gray_eye = gray_face[ey:ey+eh, ex:ex+ew] # get eye
@@ -83,21 +88,23 @@ if __name__ == '__main__':
         faces = face_cascade.detectMultiScale(img, 1.3, 5)
         
         for (x,y,w,h) in faces:
-            # pull face sub-image
+            # Pull face sub-image
             gray_face = gray[y:y+h, x:x+w]
             face = img[y:y+h, x:x+w]
             
-            #eyes = eye_cascade.detectMultiScale(gray_face) # locate eye regions
             eyes = eye_cascade.detectMultiScale(gray_face, 3.0, 5) # locate eye regions
             
+            # This ignores any frames where we have detected too few or too many eyes.
+            # This generally won't filter out too many frames, as most detect eyes pretty well.
+            # This is needed so we don't get bad data in our rolling averages.
             if len(eyes) != 2:
                 continue
 
             # Uncomment to add boxes around face and eyes.
-            #cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)                              #####
-            #color_face = img[y:y+h, x:x+w]                                              #####
-            #for (ex,ey,ew,eh) in eyes:                                                  #####
-            #    cv2.rectangle(color_face,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)             #####
+            #cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+            #color_face = img[y:y+h, x:x+w]
+            #for (ex,ey,ew,eh) in eyes:
+            #    cv2.rectangle(color_face,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
 
             pupil_avg = getPupilAvgFromFace(gray_face, eyes, x, y, w, h)
 
