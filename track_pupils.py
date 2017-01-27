@@ -27,10 +27,11 @@ def findEyeCenter(gray_eye, thresh_eye):
 def getPupilAvgFromFace(gray_face, eyes, x, y, w, h):
     """
     getPupilAvgFromFace(gray_face, eyes, x, y, w, h): Takes a grey version of face image,
-    a list of eyes, and the x, y, w, h, coordinates of the face. Returns a list [x, y] for 
-    the average between the eyes contained in the list.
+    a list of eyes, and the x, y, w, h, coordinates of the face. Returns a list [[xp, yp],(xe,ye)] where
+    xa, ya are the x any y averages of the pupils and xe, ye are the averages of the eyes.
     """
     pupil_avg = [0,0]
+    eye_avg = [0,0]
     for (ex,ey,ew,eh) in eyes:                
         gray_eye = gray_face[ey:ey+eh, ex:ex+ew] # get eye
         #eye = face[ey:ey+eh, ex:ex+ew]
@@ -44,15 +45,19 @@ def getPupilAvgFromFace(gray_face, eyes, x, y, w, h):
         pupil = findEyeCenter(gray_eye, thresh)
 
         # Uncomment to highlight individual pupils.
-        #cv2.circle(img, (pupil[1] + ex + x, pupil[0] + ey + y), 2, (0,255,0), -1)
+        cv2.circle(img, (pupil[1] + ex + x, pupil[0] + ey + y), 2, (0,255,0), -1)
 
         pupil_avg[0] += pupil[1] + ex + x;
         pupil_avg[1] += pupil[0] + ey + y;
 
+        eye_avg[0] += ex + x + ew / 2
+        eye_avg[1] += ey + y + ew / 2
+
     # Compute pupil average
     pupil_avg = [x / len(eyes) for x in pupil_avg]
+    eye_avg = [x / len(eyes) for x in eye_avg]
     
-    return pupil_avg
+    return [pupil_avg, eye_avg]
     
 #
 ## main function
@@ -67,8 +72,8 @@ if __name__ == '__main__':
     if eye_cascade.empty():
         print "did not load eye classifier"
     
-    cap = cv2.VideoCapture('/Users/bsoper/Movies/eye_tracking/cal_1.mov')
-    #cap = cv2.VideoCapture(0)
+    #cap = cv2.VideoCapture('/Users/bsoper/Movies/eye_tracking/cal_2.mov')
+    cap = cv2.VideoCapture(0)
 
     #center_count = 0
     have_center = False
@@ -106,11 +111,14 @@ if __name__ == '__main__':
             #for (ex,ey,ew,eh) in eyes:
             #    cv2.rectangle(color_face,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
 
-            pupil_avg = getPupilAvgFromFace(gray_face, eyes, x, y, w, h)
+            [pupil_avg, center] = getPupilAvgFromFace(gray_face, eyes, x, y, w, h)
 
             if have_center == False:
                 center = pupil_avg
                 have_center = True
+
+            # Recalibrate center based on face position.
+            # center[0] = x + w / 2
 
             # Highlight center.
             if have_center:
@@ -126,9 +134,9 @@ if __name__ == '__main__':
             cv2.circle(img, (avgs[0], avgs[1]), 2, (0,0,255), -1)
 
             # Uncomment to show unscaled movement of average.
-            #x = center[0] + (pupil_avg[0] - center[0])
-            #y = center[1] + (pupil_avg[1] - center[1])
-            #cv2.circle(img, (x, y), 2, (0,255,0), -1)
+            x = center[0] + (pupil_avg[0] - center[0])
+            y = center[1] + (pupil_avg[1] - center[1])
+            cv2.circle(img, (x, y), 2, (0,255,0), -1)
 
         cv2.imshow('frame', img)
         
