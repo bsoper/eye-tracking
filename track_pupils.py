@@ -107,6 +107,8 @@ if __name__ == '__main__':
             pupil_color = (0,255,0)
             cv2.circle(img, (pupil_avg[0], pupil_avg[1]), 2, pupil_color, -1)
 
+
+
         cv2.imshow('frame', img)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
