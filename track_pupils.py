@@ -1,4 +1,5 @@
-import cv2
+import cv2 
+import collections
 
 def findEyeCenter(gray_eye, thresh_eye):
     """ findEyeCenter: approximates the center of the pupil by selecting
@@ -23,6 +24,36 @@ def findEyeCenter(gray_eye, thresh_eye):
 
     return pupil
 
+def getPupilAvgFromFace(gray_face, eyes, x, y, w, h):
+    """
+    getPupilAvgFromFace(gray_face, eyes, x, y, w, h): Takes a grey version of face image,
+    a list of eyes, and the x, y, w, h, coordinates of the face. Returns a list [x, y] for 
+    the average between the eyes contained in the list.
+    """
+    pupil_avg = [0,0]
+    for (ex,ey,ew,eh) in eyes:                
+        gray_eye = gray_face[ey:ey+eh, ex:ex+ew] # get eye
+        #eye = face[ey:ey+eh, ex:ex+ew]
+        
+        # apply gaussian blur to image
+        blur = cv2.GaussianBlur(gray_eye, (15,15), 3*gray_eye.shape[0])
+        retval, thresh = cv2.threshold(~blur, 150, 255, cv2.THRESH_BINARY) 
+        contours, hierarchy = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cv2.drawContours(thresh, contours, -1, (255, 255, 255), -1)
+        #circles = cv2.HoughCircles(thresh, cv2.cv.CV_HOUGH_GRADIENT, 1, 1) 
+        pupil = findEyeCenter(gray_eye, thresh)
+
+        # Uncomment to highlight individual pupils.
+        #cv2.circle(img, (pupil[1] + ex + x, pupil[0] + ey + y), 2, (0,255,0), -1)
+
+        pupil_avg[0] += pupil[1] + ex + x;
+        pupil_avg[1] += pupil[0] + ey + y;
+
+    # Compute pupil average
+    pupil_avg = [x / len(eyes) for x in pupil_avg]
+    
+    return pupil_avg
+    
 #
 ## main function
 #
@@ -36,9 +67,14 @@ if __name__ == '__main__':
 
     if eye_cascade.empty():
         print "did not load eye classifier"
-
-    #cap = cv2.VideoCapture('/Users/bsoper/Movies/eye_tracking/face.mov')
+    
+    #cap = cv2.VideoCapture('/Users/bsoper/Movies/eye_tracking/cal_1.mov')
     cap = cv2.VideoCapture(0)
+
+    #center_count = 0
+    have_center = False
+    center = [0,0]
+    rolling_pupil_avg = collections.deque(maxlen=5)
 
     while(cap.isOpened()):
 
@@ -55,59 +91,47 @@ if __name__ == '__main__':
         faces = face_cascade.detectMultiScale(img, face_scale_factor, face_min_neighbors)
 
         for (x,y,w,h) in faces:
-            # pull face sub-image
+            # Pull face sub-image
             gray_face = gray[y:y+h, x:x+w]
             face = img[y:y+h, x:x+w]
-
-            #eyes = eye_cascade.detectMultiScale(gray_face) # locate eye regions
-            eye_scale_factor = 3.0
-            eye_min_neighbors = 5
-
-            #Locate Eye Regions
-            eyes = eye_cascade.detectMultiScale(gray_face, eye_scale_factor, eye_min_neighbors)
-
-            if len(eyes) == 0:
+            
+            eyes = eye_cascade.detectMultiScale(gray_face, 3.0, 5) # locate eye regions
+            
+            # This ignores any frames where we have detected too few or too many eyes.
+            # This generally won't filter out too many frames, as most detect eyes pretty well.
+            # This is needed so we don't get bad data in our rolling averages.
+            if len(eyes) != 2:
                 continue
 
-            #cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)                              #####
-            #color_face = img[y:y+h, x:x+w]                                              #####
-            #for (ex,ey,ew,eh) in eyes:                                                  #####
-            #    cv2.rectangle(color_face,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)             #####
+            # Uncomment to add boxes around face and eyes.
+            #cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+            #color_face = img[y:y+h, x:x+w]
+            #for (ex,ey,ew,eh) in eyes:
+            #    cv2.rectangle(color_face,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
 
+            pupil_avg = getPupilAvgFromFace(gray_face, eyes, x, y, w, h)
 
-            pupil_avg = [0,0]
-            #"""
-            for (ex,ey,ew,eh) in eyes:
-                gray_eye = gray_face[ey:ey+eh, ex:ex+ew] # get eye
-                #eye = face[ey:ey+eh, ex:ex+ew]
+            if have_center == False:
+                center = pupil_avg
+                have_center = True
 
-                # apply gaussian blur to image
-                blur = cv2.GaussianBlur(gray_eye, (15,15), 3*gray_eye.shape[0])
+            # Highlight center.
+            if have_center:
+                cv2.circle(img, (center[0], center[1]), 2, (255,0,0), -1)
+            x_scaled = center[0] + (pupil_avg[0] - center[0]) * 40
+            y_scaled = center[1] + (pupil_avg[1] - center[1]) * 40
 
-                retval, thresh = cv2.threshold(~blur, 150, 255, cv2.THRESH_BINARY)
+            rolling_pupil_avg.appendleft((x_scaled, y_scaled))
+            
+            avgs = (sum(a) for a in zip(*rolling_pupil_avg))
+            avgs = [a / len(rolling_pupil_avg) for a in avgs]
 
-                contours, hierarchy = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            cv2.circle(img, (avgs[0], avgs[1]), 2, (0,0,255), -1)
 
-                cv2.drawContours(thresh, contours, -1, (255, 255, 255), -1)
-                #circles = cv2.HoughCircles(thresh, cv2.cv.CV_HOUGH_GRADIENT, 1, 1)
-
-                pupil = findEyeCenter(gray_eye, thresh)
-
-                #cv2.circle(eye, pupil, 0, (0,255,0), -1)
-
-                #cv2.circle(img, (pupil[1] + ex + x, pupil[0] + ey + y), 2, (0,255,0), -1)
-
-                pupil_avg[0] += pupil[1] + ex + x;
-                pupil_avg[1] += pupil[0] + ey + y;
-            #"""
-
-            pupil_avg = [x / len(eyes) for x in pupil_avg]
-
-            #Plot pupil on screen
-            pupil_color = (0,255,0)
-            cv2.circle(img, (pupil_avg[0], pupil_avg[1]), 2, pupil_color, -1)
-
-
+            # Uncomment to show unscaled movement of average.
+            #x = center[0] + (pupil_avg[0] - center[0])
+            #y = center[1] + (pupil_avg[1] - center[1])
+            #cv2.circle(img, (x, y), 2, (0,255,0), -1)
 
         cv2.imshow('frame', img)
 
@@ -121,4 +145,3 @@ if __name__ == '__main__':
 # cleanup
 cap.release()
 cv2.destroyAllWindows()
-
