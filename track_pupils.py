@@ -13,8 +13,8 @@ def findEyeCenter(gray_eye, thresh_eye):
     minBlack = 300
     pupil = [0, 0]
 
-    for i in xrange(dims[0]):
-        for j in xrange(dims[1]):
+    for i in range(dims[0]):
+        for j in range(dims[1]):
             if thresh_eye[i][j]:
                 if gray_eye[i][j] < minBlack:
                     minBlack = gray_eye[i][j]
@@ -32,10 +32,10 @@ if __name__ == '__main__':
     eye_cascade = cv2.CascadeClassifier('haarcascade_eye.xml')
 
     if face_cascade.empty():
-        print "did not load face classifier"
+        print("did not load face classifier")
 
     if eye_cascade.empty():
-        print "did not load eye classifier"
+        print("did not load eye classifier")
 
     #cap = cv2.VideoCapture('/Users/bsoper/Movies/eye_tracking/face.mov')
     cap = cv2.VideoCapture(0)
@@ -86,7 +86,7 @@ if __name__ == '__main__':
 
                 retval, thresh = cv2.threshold(~blur, 150, 255, cv2.THRESH_BINARY)
 
-                contours, hierarchy = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+                _, contours, hierarchy = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
                 cv2.drawContours(thresh, contours, -1, (255, 255, 255), -1)
                 #circles = cv2.HoughCircles(thresh, cv2.cv.CV_HOUGH_GRADIENT, 1, 1)
@@ -105,7 +105,7 @@ if __name__ == '__main__':
 
             #Plot pupil on screen
             pupil_color = (0,255,0)
-            cv2.circle(img, (pupil_avg[0], pupil_avg[1]), 2, pupil_color, -1)
+            cv2.circle(img, (int(pupil_avg[0]), int(pupil_avg[1])), 2, pupil_color, -1)
 
 
 
