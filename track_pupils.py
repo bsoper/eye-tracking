@@ -74,7 +74,7 @@ if __name__ == '__main__':
     #center_count = 0
     have_center = False
     center = [0,0]
-    rolling_pupil_avg = collections.deque(maxlen=5)
+    rolling_pupil_avg = collections.deque(maxlen=3)
 
     while(cap.isOpened()):
 
@@ -118,15 +118,21 @@ if __name__ == '__main__':
             # Highlight center.
             if have_center:
                 cv2.circle(img, (center[0], center[1]), 2, (255,0,0), -1)
-            x_scaled = center[0] + (pupil_avg[0] - center[0]) * 40
-            y_scaled = center[1] + (pupil_avg[1] - center[1]) * 40
+            x_scaled = center[0] + (pupil_avg[0] - center[0]) * 60
+            y_scaled = center[1] + (pupil_avg[1] - center[1]) * 50
 
             rolling_pupil_avg.appendleft((x_scaled, y_scaled))
             
             avgs = (sum(a) for a in zip(*rolling_pupil_avg))
             avgs = [a / len(rolling_pupil_avg) for a in avgs]
 
-            cv2.circle(img, (avgs[0], avgs[1]), 2, (0,0,255), -1)
+            cv2.circle(img, (avgs[0], avgs[1]), 10, (0,0,255), -1)
+            if avgs[0] - center[0] < -20:
+                print 'Left'
+            elif avgs[0] - center[0] < 20:
+                print 'Right'
+
+            #cv2.circle(img, (x_scaled, y_scaled), 2, (0,0,255), -1)
 
             # Uncomment to show unscaled movement of average.
             #x = center[0] + (pupil_avg[0] - center[0])
@@ -135,13 +141,20 @@ if __name__ == '__main__':
 
         cv2.imshow('frame', img)
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            cv2.imwrite('bad_eye.jpg', img)
-            break
+        if cv2.waitKey(1) & 0xFF == ord('c'):
+            print 'Calibrating Center'
+            center = pupil_avg
+        #    cv2.imwrite('bad_eye.jpg', img)
+        #    break
 
-        if cv2.waitKey(1) & 0xFF  == ord('k'):
+        if cv2.waitKey(1) & 0xFF == ord('k'):
+            print 'Pressed k'
             cap.release()
             break
+
+        #if cv2.waitKey(1) & 0xFF == ord('c'):
+        #    center = pupil_avg
+        #    print 'Calibrating Center'
 # cleanup
 cap.release()
 cv2.destroyAllWindows()
