@@ -61,12 +61,20 @@ def getPupilAvgFromFace(gray_face, eyes, x, y, w, h):
 if __name__ == '__main__':
     face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
     eye_cascade = cv2.CascadeClassifier('haarcascade_eye.xml')
+    left_eye_cascade = cv2.CascadeClassifier('haarcascade_lefteye_2splits.xml')
+    right_eye_cascade = cv2.CascadeClassifier('haarcascade_righteye_2splits.xml')
 
     if face_cascade.empty():
-        print "did not load face classifier"
+        print "Did not load face classifier."
 
     if eye_cascade.empty():
-        print "did not load eye classifier"
+        print "Did not load eye classifier."
+
+    if left_eye_cascade.empty():
+        print "Did not load left eye classifier."
+
+    if right_eye_cascade.empty():
+        print "Did not load right eye classifier."
     
     #cap = cv2.VideoCapture('/Users/bsoper/Movies/eye_tracking/cal_1.mov')
     cap = cv2.VideoCapture(0)
@@ -96,11 +104,17 @@ if __name__ == '__main__':
             face = img[y:y+h, x:x+w]
             
             eyes = eye_cascade.detectMultiScale(gray_face, 3.0, 5) # locate eye regions
+            left_eye = left_eye_cascade.detectMultiScale(gray_face, 3.0, 5) # locate left eye regions
+            right_eye = right_eye_cascade.detectMultiScale(gray_face, 3.0, 5) # locate left eye regions
+
+            if len(left_eye) == 1 and len(right_eye) == 1 and len(eyes) != 2:
+                print "Blink"
             
             # This ignores any frames where we have detected too few or too many eyes.
             # This generally won't filter out too many frames, as most detect eyes pretty well.
             # This is needed so we don't get bad data in our rolling averages.
             if len(eyes) != 2:
+                #print "Two eyes not detected"
                 continue
 
             # Uncomment to add boxes around face and eyes.
