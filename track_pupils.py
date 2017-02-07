@@ -1,4 +1,5 @@
 import cv2
+import pyautogui
 
 def findEyeCenter(gray_eye, thresh_eye):
     """ findEyeCenter: approximates the center of the pupil by selecting
@@ -106,6 +107,10 @@ if __name__ == '__main__':
             #Plot pupil on screen
             pupil_color = (0,255,0)
             cv2.circle(img, (int(pupil_avg[0]), int(pupil_avg[1])), 2, pupil_color, -1)
+
+            #Test movement of mouse to pupil location
+            pyautogui.moveTo(int(pupil_avg[0]), int(pupil_avg[1]))
+
 
 
 
