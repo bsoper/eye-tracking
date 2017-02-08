@@ -45,7 +45,7 @@ def getPupilAvgFromFace(gray_face, eyes, x, y, w, h):
         pupil = findEyeCenter(gray_eye, thresh)
 
         # Uncomment to highlight individual pupils.
-        #cv2.circle(img, (pupil[1] + ex + x, pupil[0] + ey + y), 2, (0,255,0), -1)
+        cv2.circle(img, (pupil[1] + ex + x, pupil[0] + ey + y), 2, (0,255,0), -1)
 
         pupil_avg[0] += pupil[1] + ex + x;
         pupil_avg[1] += pupil[0] + ey + y;
@@ -84,6 +84,7 @@ if __name__ == '__main__':
     have_center = False
     center = [0,0]
     rolling_pupil_avg = collections.deque(maxlen=5)
+    blink_count = 0
 
     while(cap.isOpened()):
 
@@ -108,14 +109,26 @@ if __name__ == '__main__':
             left_eye = left_eye_cascade.detectMultiScale(gray_face, 3.0, 5) # locate left eye regions
             right_eye = right_eye_cascade.detectMultiScale(gray_face, 3.0, 5) # locate left eye regions
 
-            if len(left_eye) == 1 and len(right_eye) == 1 and len(eyes) != 2:
-                print "Blink"
-            
             # This ignores any frames where we have detected too few or too many eyes.
             # This generally won't filter out too many frames, as most detect eyes pretty well.
             # This is needed so we don't get bad data in our rolling averages.
-            if len(eyes) != 2:
-                #print "Two eyes not detected"
+            # Sometimes it will detect both eyes as right and left, so we just want to check if
+            # it detected none, or more than two of each.
+            if (len(left_eye) > 0 and len(left_eye) <= 2 and
+                len(right_eye) > 0 and len(right_eye) <= 2):
+                if len(eyes) == 0:
+                    blink_count += 1
+                    continue
+                else:
+                    if blink_count >= 7:
+                        print '\nLong Blink'
+                        blink_count = 0
+                    elif blink_count >= 2:
+                        print '\nBlink'
+                        blink_count = 0
+                    else:
+                        blink_count = 0
+            else:
                 continue
 
             # Uncomment to add boxes around face and eyes.
