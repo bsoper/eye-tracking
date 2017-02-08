@@ -1,5 +1,6 @@
 import cv2 
 import collections
+import math
 
 def findEyeCenter(gray_eye, thresh_eye):
     """ findEyeCenter: approximates the center of the pupil by selecting
@@ -135,12 +136,22 @@ if __name__ == '__main__':
             x_scaled = center[0] + (pupil_avg[0] - center[0]) * 40
             y_scaled = center[1] + (pupil_avg[1] - center[1]) * 40
 
+            avgs = (sum(a) for a in zip(*rolling_pupil_avg))
+            avgs = [a / len(rolling_pupil_avg) for a in avgs]
+
+            # Clear the rolling average if new position is far enough away from average.
+            if len(avgs) > 2 and math.hypot(x_scaled - avgs[0], y_scaled - avgs[1]) > 225:
+                rolling_pupil_avg.clear() 
+
             rolling_pupil_avg.appendleft((x_scaled, y_scaled))
             
             avgs = (sum(a) for a in zip(*rolling_pupil_avg))
             avgs = [a / len(rolling_pupil_avg) for a in avgs]
 
-            cv2.circle(img, (avgs[0], avgs[1]), 2, (0,0,255), -1)
+            cv2.circle(img, (avgs[0], avgs[1]), 5, (0,0,255), -1)
+
+            # Uncomment to see location without averaging
+            #cv2.circle(img, (x_scaled, y_scaled), 5, (255,0,255), -1)
 
             # Uncomment to show unscaled movement of average.
             #x = center[0] + (pupil_avg[0] - center[0])
