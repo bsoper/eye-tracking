@@ -133,8 +133,8 @@ if __name__ == '__main__':
             # Highlight center.
             if have_center:
                 cv2.circle(img, (center[0], center[1]), 2, (255,0,0), -1)
-            x_scaled = center[0] + (pupil_avg[0] - center[0]) * 40
-            y_scaled = center[1] + (pupil_avg[1] - center[1]) * 40
+            x_scaled = center[0] + (pupil_avg[0] - center[0]) * 80
+            y_scaled = center[1] + (pupil_avg[1] - center[1]) * 80
 
             avgs = (sum(a) for a in zip(*rolling_pupil_avg))
             avgs = [a / len(rolling_pupil_avg) for a in avgs]
