@@ -69,7 +69,7 @@ class Window(QtWidgets.QWidget):
 
         self.show()
 
-    #Button Callback Definitions
+    # Button Callback Definitions
     def top_clicked(self):
         self.print_text.setText('Top Button Clicked')
 
@@ -81,6 +81,18 @@ class Window(QtWidgets.QWidget):
 
     def bottom_clicked(self):
         self.print_text.setText('Bottom Button Clicked')
+
+    # Key Press Events
+    def keyPressEvent(self, event):
+        if event.text() == 'a':
+            QtWidgets.QMessageBox.information(None,"Received Key Press Event!!",
+                                     "A is for Alpaca")
+        elif event.text() == 'b':
+            QtWidgets.QMessageBox.information(None,"Received Key Press Event!!",
+                                     "B is for Brunch")
+        elif event.text() == 'c':
+            QtWidgets.QMessageBox.information(None,"Received Key Press Event!!",
+                                     "C is for Clipart")
 
 def run_app(app):
     sys.exit(app.exec_())
