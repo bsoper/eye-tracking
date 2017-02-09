@@ -83,7 +83,7 @@ if __name__ == '__main__':
     #center_count = 0
     have_center = False
     center = [0,0]
-    rolling_pupil_avg = collections.deque(maxlen=5)
+    rolling_pupil_avg = collections.deque(maxlen=3)
     blink_count = 0
 
     while(cap.isOpened()):
@@ -128,7 +128,8 @@ if __name__ == '__main__':
                         blink_count = 0
                     else:
                         blink_count = 0
-            else:
+            
+            if len(eyes) != 2:
                 continue
 
             # Uncomment to add boxes around face and eyes.
@@ -149,19 +150,16 @@ if __name__ == '__main__':
             x_scaled = center[0] + (pupil_avg[0] - center[0]) * 80
             y_scaled = center[1] + (pupil_avg[1] - center[1]) * 80
 
-            avgs = (sum(a) for a in zip(*rolling_pupil_avg))
-            avgs = [a / len(rolling_pupil_avg) for a in avgs]
-
-            # Clear the rolling average if new position is far enough away from average.
-            if len(avgs) > 2 and math.hypot(x_scaled - avgs[0], y_scaled - avgs[1]) > 225:
-                rolling_pupil_avg.clear() 
-
             rolling_pupil_avg.appendleft((x_scaled, y_scaled))
             
             avgs = (sum(a) for a in zip(*rolling_pupil_avg))
             avgs = [a / len(rolling_pupil_avg) for a in avgs]
 
             cv2.circle(img, (avgs[0], avgs[1]), 5, (0,0,255), -1)
+            #if avgs[0] - center[0] < -200:
+            #    print 'Left'
+            #elif avgs[0] - center[0] > 200:
+            #    print 'Right'
 
             # Uncomment to see location without averaging
             #cv2.circle(img, (x_scaled, y_scaled), 5, (255,0,255), -1)
@@ -173,9 +171,8 @@ if __name__ == '__main__':
 
         cv2.imshow('frame', img)
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            cv2.imwrite('bad_eye.jpg', img)
-            break
+        if cv2.waitKey(1) & 0xFF == ord('c'):
+            center = pupil_avg
 
         if cv2.waitKey(1) & 0xFF  == ord('k'):
             cap.release()
