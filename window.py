@@ -11,8 +11,6 @@ class Window(QtWidgets.QWidget):
 
         self.init_ui()
 
-        #Start image processing tab
-        self.get_thread(IPT.imageProcessingThread())
 
     def init_ui(self):
         self.top_button = QtWidgets.QPushButton('Top Button')
