@@ -1,5 +1,8 @@
 import cv2
 import pyautogui
+import window
+from PyQt5 import QtWidgets, QtGui
+import sys
 
 def findEyeCenter(gray_eye, thresh_eye):
     """ findEyeCenter: approximates the center of the pupil by selecting
@@ -24,11 +27,7 @@ def findEyeCenter(gray_eye, thresh_eye):
 
     return pupil
 
-#
-## main function
-#
-
-if __name__ == '__main__':
+def detectPupils():
     face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
     eye_cascade = cv2.CascadeClassifier('haarcascade_eye.xml')
 
@@ -123,7 +122,9 @@ if __name__ == '__main__':
         if cv2.waitKey(1) & 0xFF  == ord('k'):
             cap.release()
             break
-# cleanup
-cap.release()
-cv2.destroyAllWindows()
+    # cleanup
+    cap.release()
+    cv2.destroyAllWindows()
 
+if __name__ == '__main__':
+    detectPupils()
