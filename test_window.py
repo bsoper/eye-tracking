@@ -116,9 +116,9 @@ class TrackingThread(QtCore.QThread):
             blink_count = 0
             x_scale_factor = 60
             y_scale_factor = 60
+            frame_count = 0
 
             while(cap.isOpened()):
-
                 # pull video frame
                 ret, img = cap.read()
                 img = cv2.flip(img,1)
@@ -153,12 +153,14 @@ class TrackingThread(QtCore.QThread):
                         if len(eyes) == 0:
                             blink_count += 1
                             continue
-                        else:
+                        elif len(eyes) == 2:
                             if blink_count >= 7:
-                                print('\nLong Blink')
+                                print('\nLong Blink', blink_count)
+                                pyautogui.click()
                                 blink_count = 0
                             elif blink_count >= 2:
-                                print('\nBlink')
+                                print('\nBlink', blink_count)
+                                pyautogui.click()
                                 blink_count = 0
                             else:
                                 blink_count = 0
@@ -192,12 +194,14 @@ class TrackingThread(QtCore.QThread):
                     cv2.circle(img, (int(avgs[0]), int(avgs[1])), 5, (0,0,255), -1)
 
                     #Move mouse cursor
-                    pyautogui.moveTo(avgs[0], avgs[1])
+                    #pyautogui.moveTo(avgs[0], avgs[1])
 
-                    #if avgs[0] - center[0] < -200:
-                    #    print('Left')
-                    #elif avgs[0] - center[0] > 200:
-                    #    print('Right')
+                    if avgs[0] - center[0] < -200:
+                        pyautogui.moveTo(200, 500)
+                        #print('Left')
+                    elif avgs[0] - center[0] > 200:
+                        pyautogui.moveTo(1200, 500)
+                        #print('Right')
 
                     # Uncomment to see location without averaging
                     #cv2.circle(img, (x_scaled, y_scaled), 5, (255,0,255), -1)
