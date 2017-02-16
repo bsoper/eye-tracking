@@ -242,10 +242,11 @@ class UIWidget(QtWidgets.QWidget):
 
         self.thread.startProcessing()
 
-        #Initialize UI
-        self.init_ui()
+        #Initialize UI -- only one init can be uncommented
+        #self.init_basic_ui()
+        self.init_ui6() #6 button layout
 
-    def init_ui(self):
+    def init_basic_ui(self):
         self.showFullScreen()
         self.b1 = QtWidgets.QPushButton("Left Button")
         self.b2 = QtWidgets.QPushButton("Right Button")
@@ -270,7 +271,55 @@ class UIWidget(QtWidgets.QWidget):
 
         self.setLayout(w_layout)
 
+    def init_ui6(self):
+        self.showFullScreen()
+        self.b1 = QtWidgets.QPushButton("Button 1")
+        self.b2 = QtWidgets.QPushButton("Button 2")
+        self.b3 = QtWidgets.QPushButton("Button 3")
+        self.b4 = QtWidgets.QPushButton("Button 4")
+        self.b5 = QtWidgets.QPushButton("Button 5")
+        self.b6 = QtWidgets.QPushButton("Button 6")
 
+        #Resize the buttons - they will all be squares
+        b_width = 300
+        b_height = 300
+        self.b1.setFixedSize(b_width, b_height)
+        self.b2.setFixedSize(b_width, b_height)
+        self.b3.setFixedSize(b_width, b_height)
+        self.b4.setFixedSize(b_width, b_height)
+        self.b5.setFixedSize(b_width, b_height)
+        self.b6.setFixedSize(b_width, b_height)
+
+        #Create layout
+        b_layout_top = QtWidgets.QHBoxLayout()
+        b_layout_top.addStretch()
+        b_layout_top.addWidget(self.b1)
+        b_layout_top.addStretch()
+        b_layout_top.addWidget(self.b2)
+        b_layout_top.addStretch()
+        b_layout_top.addWidget(self.b3)
+        b_layout_top.addStretch()
+
+        text_layout = QtWidgets.QHBoxLayout()
+
+
+        b_layout_bot = QtWidgets.QHBoxLayout()
+        b_layout_bot.addStretch()
+        b_layout_bot.addWidget(self.b4)
+        b_layout_bot.addStretch()
+        b_layout_bot.addWidget(self.b5)
+        b_layout_bot.addStretch()
+        b_layout_bot.addWidget(self.b6)
+        b_layout_bot.addStretch()
+
+        master_layout = QtWidgets.QVBoxLayout()
+        master_layout.addStretch()
+        master_layout.addLayout(b_layout_top)
+        master_layout.addStretch()
+        master_layout.addLayout(b_layout_bot)
+        master_layout.addStretch()
+
+        self.setLayout(master_layout)
 
     def keyPressEvent(self, event):
         if event.text() == 'q':
