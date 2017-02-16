@@ -1,6 +1,7 @@
 from PyQt5 import QtCore as QtCore
 from PyQt5 import QtWidgets as QtWidgets
-from PyQt5 import QtGui as QtGui
+from PyQt5 import QtGui as QtGu
+from PyQt5.QtCore import *
 import sys
 import cv2
 import collections
@@ -8,6 +9,9 @@ import math
 import pyautogui
 
 class TrackingThread(QtCore.QThread):
+
+    request_button_centers = pyqtSignal()
+
     def __init__(self, parent=None):
         super(TrackingThread, self).__init__(parent)
 
@@ -17,6 +21,11 @@ class TrackingThread(QtCore.QThread):
         self.restart = False
         self.abort = False
 
+        #Centers of buttons used for snapping
+        self.button_centers = []
+
+        #Connect signal to update buttons to setButtonCenters
+
     def __del__(self):
         self.mutex.lock()
         self.abort = True
@@ -24,6 +33,13 @@ class TrackingThread(QtCore.QThread):
         self.mutex.unlock()
 
         self.wait()
+
+    @pyqtSlot(list)
+    def setButtonCenters(self, centers):
+        self.button_centers = centers
+        for center in centers:
+            print(center)
+
 
     def startProcessing(self):
         locker = QtCore.QMutexLocker(self.mutex)
@@ -88,6 +104,7 @@ class TrackingThread(QtCore.QThread):
         return pupil_avg
 
     def run(self):
+        self.request_button_centers.emit()
         while True:
             face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
             eye_cascade = cv2.CascadeClassifier('haarcascade_eye.xml')
@@ -232,6 +249,10 @@ class TrackingThread(QtCore.QThread):
             #cv2.destroyAllWindows()
 
 class UIWidget(QtWidgets.QWidget):
+
+    #Signal to update button center locations in thread
+    update_button_centers = pyqtSignal(list)
+
     def __init__(self, parent=None):
         super(UIWidget, self).__init__(parent)
 
@@ -239,12 +260,18 @@ class UIWidget(QtWidgets.QWidget):
         self.setWindowTitle("Pupil Tracker")
         self.resize(550, 400)
         self.thread = TrackingThread()
-
-        self.thread.startProcessing()
+        self.button_centers = list()
 
         #Initialize UI -- only one init can be uncommented
         #self.init_basic_ui()
         self.init_ui6() #6 button layout
+
+        #Pass center information to thread
+        self.update_button_centers.connect(self.thread.setButtonCenters)
+        self.thread.request_button_centers.connect(self.establishButtonCenters)
+
+        #Send button centers to thread
+        self.thread.startProcessing()
 
     def init_basic_ui(self):
         self.showFullScreen()
@@ -273,12 +300,12 @@ class UIWidget(QtWidgets.QWidget):
 
     def init_ui6(self):
         self.showFullScreen()
-        self.b1 = QtWidgets.QPushButton("Button 1")
-        self.b2 = QtWidgets.QPushButton("Button 2")
-        self.b3 = QtWidgets.QPushButton("Button 3")
-        self.b4 = QtWidgets.QPushButton("Button 4")
-        self.b5 = QtWidgets.QPushButton("Button 5")
-        self.b6 = QtWidgets.QPushButton("Button 6")
+        self.b1 = QtWidgets.QPushButton("Button 1", parent=self)
+        self.b2 = QtWidgets.QPushButton("Button 2", parent=self)
+        self.b3 = QtWidgets.QPushButton("Button 3", parent=self)
+        self.b4 = QtWidgets.QPushButton("Button 4", parent=self)
+        self.b5 = QtWidgets.QPushButton("Button 5", parent=self)
+        self.b6 = QtWidgets.QPushButton("Button 6", parent=self)
 
         #Resize the buttons - they will all be squares
         b_width = 300
@@ -289,6 +316,7 @@ class UIWidget(QtWidgets.QWidget):
         self.b4.setFixedSize(b_width, b_height)
         self.b5.setFixedSize(b_width, b_height)
         self.b6.setFixedSize(b_width, b_height)
+
 
         #Create layout
         b_layout_top = QtWidgets.QHBoxLayout()
@@ -301,7 +329,10 @@ class UIWidget(QtWidgets.QWidget):
         b_layout_top.addStretch()
 
         text_layout = QtWidgets.QHBoxLayout()
-
+        self.print_text = QtWidgets.QLabel("Text printed here...")
+        text_layout.addStretch()
+        text_layout.addWidget(self.print_text)
+        text_layout.addStretch()
 
         b_layout_bot = QtWidgets.QHBoxLayout()
         b_layout_bot.addStretch()
@@ -316,6 +347,8 @@ class UIWidget(QtWidgets.QWidget):
         master_layout.addStretch()
         master_layout.addLayout(b_layout_top)
         master_layout.addStretch()
+        master_layout.addLayout(text_layout)
+        master_layout.addStretch()
         master_layout.addLayout(b_layout_bot)
         master_layout.addStretch()
 
@@ -325,6 +358,20 @@ class UIWidget(QtWidgets.QWidget):
         if event.text() == 'q':
             QtWidgets.QApplication.quit()
 
+        if event.text() == 'b':
+            self.establishButtonCenters()
+
+    @pyqtSlot()
+    def establishButtonCenters(self):
+        ###Used to create list of button centers
+        buttons = [self.b1, self.b2, self.b3, self.b4, self.b5, self.b6]
+        for button in buttons:
+            #Get the center of the button
+            global_center = button.mapToGlobal(button.geometry().center())
+            center_tup = (global_center.x(),global_center.y())
+            self.button_centers.append(center_tup)
+
+        self.update_button_centers.emit(self.button_centers)
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
