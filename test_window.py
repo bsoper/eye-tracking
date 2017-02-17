@@ -131,7 +131,7 @@ class UIWidget(QtWidgets.QWidget):
         buttons = [self.b1, self.b2, self.b3, self.b4, self.b5, self.b6]
         for button in buttons:
             #Get the center of the button
-            global_center = button.mapToGlobal(button.geometry().center())
+            global_center = self.mapToGlobal(button.geometry().center())
             center_tup = (global_center.x(),global_center.y())
             self.button_centers.append(center_tup)
 
