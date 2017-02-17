@@ -27,6 +27,8 @@ class TrackingThread(QtCore.QThread):
         self.button_centers = []
 
         #Connect signal to update buttons to setButtonCenters
+        self.center = None
+        self.pupil_avg = None
 
     def __del__(self):
         self.mutex.lock()
@@ -84,6 +86,9 @@ class TrackingThread(QtCore.QThread):
 
         #Emit signal to tell gui thread to move cursor
         self.move_cursor_to_button.emit(closest_entry[1])
+
+    def calibrate(self):
+        self.center = self.pupil_avg
 
     def findEyeCenter(self,gray_eye, thresh_eye):
         """ findEyeCenter: approximates the center of the pupil by selecting
@@ -162,8 +167,8 @@ class TrackingThread(QtCore.QThread):
             cap = cv2.VideoCapture(0)
 
             #center_count = 0
-            have_center = False
-            center = [0,0]
+            #have_center = False
+            #center = [0,0]
             rolling_pupil_avg = collections.deque(maxlen=5)
             blink_count = 0
             x_scale_factor = 60
@@ -226,17 +231,19 @@ class TrackingThread(QtCore.QThread):
                     for (ex,ey,ew,eh) in eyes:
                         cv2.rectangle(color_face,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
 
-                    pupil_avg = self.getPupilAvgFromFace(gray_face, eyes, x, y, w, h)
+                    self.pupil_avg = self.getPupilAvgFromFace(gray_face, eyes, x, y, w, h)
+                    if self.center == None:
+                        self.calibrate()
 
-                    if have_center == False:
-                        center = pupil_avg
-                        have_center = True
+                    #if have_center == False:
+                    #    center = pupil_avg
+                    #    have_center = True
 
                     # Highlight center.
-                    if have_center:
-                        cv2.circle(img, (int(center[0]), int(center[1])), 2, (255,0,0), -1)
-                    x_scaled = center[0] + (pupil_avg[0] - center[0]) * x_scale_factor
-                    y_scaled = center[1] + (pupil_avg[1] - center[1]) * y_scale_factor
+                    #if have_center:
+                    cv2.circle(img, (int(self.center[0]), int(self.center[1])), 2, (255,0,0), -1)
+                    x_scaled = self.center[0] + (self.pupil_avg[0] - self.center[0]) * x_scale_factor
+                    y_scaled = self.center[1] + (self.pupil_avg[1] - self.center[1]) * y_scale_factor
 
                     rolling_pupil_avg.appendleft((x_scaled, y_scaled))
 
@@ -257,22 +264,24 @@ class TrackingThread(QtCore.QThread):
                         #pyautogui.moveTo(1200, 500)
                         #print('Right')
 
+                    #Move mouse cursor freely
+                    #pyautogui.moveTo(avgs[0], avgs[1])
+
+                    #Snap cursor to set locations
+                    if avgs[0] - self.center[0] < -200:
+                        pyautogui.moveTo(200, 500)
+                    elif avgs[0] - self.center[0] > 200:
+                        pyautogui.moveTo(1200, 500)
+
                     # Uncomment to see location without averaging
                     #cv2.circle(img, (x_scaled, y_scaled), 5, (255,0,255), -1)
 
                     # Uncomment to show unscaled movement of average.
-                    #x = center[0] + (pupil_avg[0] - center[0])
-                    #y = center[1] + (pupil_avg[1] - center[1])
+                    #x = self.center[0] + (self.pupil_avg[0] - self.center[0])
+                    #y = self.center[1] + (self.pupil_avg[1] - self.center[1])
                     #cv2.circle(img, (x, y), 2, (0,255,0), -1)
 
                 #cv2.imshow('frame', img)
-
-                #if cv2.waitKey(1) & 0xFF == ord('c'):
-                #    center = pupil_avg
-
-                #if cv2.waitKey(1) & 0xFF  == ord('k'):
-                #    cap.release()
-                #    break
 
                 #Mutex stuff
                 #self.mutex.lock()

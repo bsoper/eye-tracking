@@ -7,7 +7,8 @@ import cv2
 import collections
 import math
 import pyautogui
-from tracking_thread import TrackingThread as TrackingThread
+from tracking_thread import TrackingThread
+import time
 
 class UIWidget(QtWidgets.QWidget):
 
@@ -40,18 +41,24 @@ class UIWidget(QtWidgets.QWidget):
     def init_basic_ui(self):
         self.showFullScreen()
         self.b1 = QtWidgets.QPushButton("Left Button")
+
         self.b2 = QtWidgets.QPushButton("Right Button")
+
+        #self.statusBar = QtWidgets.QStatusBar()
 
         #Resize buttons
         button_width = 400
         button_height = 600
         self.b1.setFixedSize(button_width, button_height)
         self.b2.setFixedSize(button_width, button_height)
+        #self.statusBar.setFixedSize(button_width, button_height)
 
         #Create layout for buttons
         b_layout = QtWidgets.QHBoxLayout()
         b_layout.addWidget(self.b1)
         b_layout.addStretch()
+        #b_layout.addWidget(self.statusBar)
+        #b_layout.addStretch()
         b_layout.addWidget(self.b2)
 
         #Layout for window at lage
@@ -124,6 +131,22 @@ class UIWidget(QtWidgets.QWidget):
 
         if event.text() == 'b':
             self.establishButtonCenters()
+
+        if event.text() == 'c':
+            #statusBar = QtWidgets.QStatusBar()
+            #msg_bar.showMessage('Look here to calibrate.')
+            #msg_bar.hideOrShow()
+            #statusBar.showMessage('Look here to calibrate.');
+            #statusBar.show()
+            #time.sleep(1)
+            #statusBar.close()
+
+            self.calibration_popup = Popup('Calibration')
+            #self.calibration_popup.dispMessage('Look here to calibrate.', 1000)
+            self.calibration_popup.show()
+            #time.sleep(1)
+            #self.calibration_popup.close()
+            self.thread.calibrate()
 
     @pyqtSlot()
     def establishButtonCenters(self):
