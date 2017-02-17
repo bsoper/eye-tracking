@@ -140,8 +140,10 @@ class UIWidget(QtWidgets.QWidget):
     @pyqtSlot(tuple)
     def moveCursor(self, cursor_dest):
         c = QtGui.QCursor()
-        c.setPos(cursor_dest[0], cursor_dest[1] - 100)
+        c.setPos(cursor_dest[0], cursor_dest[1])
         c.setShape(QtCore.Qt.CrossCursor)
+        text = str(cursor_dest[0]) + ","  + str(cursor_dest[1])
+        self.print_text.setText(text)
         self.setCursor(c)
 
 
