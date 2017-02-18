@@ -11,13 +11,31 @@ from tracking_thread import TrackingThread as TrackingThread
 
 class CustomButton(QtWidgets.QPushButton):
     def __init__(self, parent=None):
-        super(CustomeButton, self).__init__(parent)
+        super(CustomButton, self).__init__(parent)
 
         #Allow button to track where mouse is
         self.setMouseTracking(True)
 
-    def enterEvent(self):
-        pass
+        #Connect clicking signal to click function
+        self.clicked.connect(self.buttonClicked)
+        self.released.connect(self.buttonReleased)
+
+
+    def enterEvent(self, event):
+        #Triggered when mouse hovers over button
+        self.setStyleSheet("background-color: red")
+
+    def leaveEvent(self, event):
+        #Triggered when mouse leaves area of push button
+        self.setStyleSheet("")
+
+    @pyqtSlot()
+    def buttonClicked(self):
+        self.setStyleSheet("background-color: green")
+
+    @pyqtSlot()
+    def buttonReleased(self):
+        self.setStyleSheet("background-color: red")
 
 
 class UIWidget(QtWidgets.QWidget):
@@ -50,8 +68,8 @@ class UIWidget(QtWidgets.QWidget):
 
     def init_basic_ui(self):
         self.showFullScreen()
-        self.b1 = QtWidgets.QPushButton("Left Button")
-        self.b2 = QtWidgets.QPushButton("Right Button")
+        self.b1 = CustomButton("Left Button")
+        self.b2 = CustomButton("Right Button")
 
         #Resize buttons
         button_width = 400
@@ -75,12 +93,12 @@ class UIWidget(QtWidgets.QWidget):
 
     def init_ui6(self):
         self.showFullScreen()
-        self.b1 = QtWidgets.QPushButton("\nButton 1", parent=self)
-        self.b2 = QtWidgets.QPushButton("\nButton 2", parent=self)
-        self.b3 = QtWidgets.QPushButton("\nButton 3", parent=self)
-        self.b4 = QtWidgets.QPushButton("\nButton 4", parent=self)
-        self.b5 = QtWidgets.QPushButton("\nButton 5", parent=self)
-        self.b6 = QtWidgets.QPushButton("\nButton 6", parent=self)
+        self.b1 = CustomButton("\nButton 1")
+        self.b2 = CustomButton("\nButton 2")
+        self.b3 = CustomButton("\nButton 3")
+        self.b4 = CustomButton("\nButton 4")
+        self.b5 = CustomButton("\nButton 5")
+        self.b6 = CustomButton("\nButton 6")
 
         #Resize the buttons - they will all be squares
         b_width = 300
