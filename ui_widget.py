@@ -9,6 +9,17 @@ import math
 import pyautogui
 from tracking_thread import TrackingThread as TrackingThread
 
+class CustomButton(QtWidgets.QPushButton):
+    def __init__(self, parent=None):
+        super(CustomeButton, self).__init__(parent)
+
+        #Allow button to track where mouse is
+        self.setMouseTracking(True)
+
+    def enterEvent(self):
+        pass
+
+
 class UIWidget(QtWidgets.QWidget):
 
     #Signal to update button center locations in thread
@@ -64,12 +75,12 @@ class UIWidget(QtWidgets.QWidget):
 
     def init_ui6(self):
         self.showFullScreen()
-        self.b1 = QtWidgets.QPushButton("Button 1", parent=self)
-        self.b2 = QtWidgets.QPushButton("Button 2", parent=self)
-        self.b3 = QtWidgets.QPushButton("Button 3", parent=self)
-        self.b4 = QtWidgets.QPushButton("Button 4", parent=self)
-        self.b5 = QtWidgets.QPushButton("Button 5", parent=self)
-        self.b6 = QtWidgets.QPushButton("Button 6", parent=self)
+        self.b1 = QtWidgets.QPushButton("\nButton 1", parent=self)
+        self.b2 = QtWidgets.QPushButton("\nButton 2", parent=self)
+        self.b3 = QtWidgets.QPushButton("\nButton 3", parent=self)
+        self.b4 = QtWidgets.QPushButton("\nButton 4", parent=self)
+        self.b5 = QtWidgets.QPushButton("\nButton 5", parent=self)
+        self.b6 = QtWidgets.QPushButton("\nButton 6", parent=self)
 
         #Resize the buttons - they will all be squares
         b_width = 300
