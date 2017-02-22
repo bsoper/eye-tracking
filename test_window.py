@@ -15,6 +15,9 @@ class UIWidget(QtWidgets.QWidget):
     #Signal to update button center locations in thread
     update_button_centers = pyqtSignal(list)
 
+    #Signal to calibrate pupil center
+    calibrate_pupil_centers = pyqtSignal()
+
     def __init__(self, parent=None):
         super(UIWidget, self).__init__(parent)
 
@@ -31,6 +34,7 @@ class UIWidget(QtWidgets.QWidget):
         #Pass center information to thread
         self.update_button_centers.connect(self.thread.setButtonCenters)
         self.thread.request_button_centers.connect(self.establishButtonCenters)
+        self.calibrate_pupil_centers.connect(self.thread.calibrate)
 
         #Allow for cursor movement
         self.thread.move_cursor_to_button.connect(self.moveCursor)
@@ -133,6 +137,7 @@ class UIWidget(QtWidgets.QWidget):
             self.establishButtonCenters()
 
         if event.text() == 'c':
+            self.calibrate()
             #statusBar = QtWidgets.QStatusBar()
             #msg_bar.showMessage('Look here to calibrate.')
             #msg_bar.hideOrShow()
@@ -141,12 +146,12 @@ class UIWidget(QtWidgets.QWidget):
             #time.sleep(1)
             #statusBar.close()
 
-            self.calibration_popup = Popup('Calibration')
+            #self.calibration_popup = Popup('Calibration')
             #self.calibration_popup.dispMessage('Look here to calibrate.', 1000)
-            self.calibration_popup.show()
+            #self.calibration_popup.show()
             #time.sleep(1)
             #self.calibration_popup.close()
-            self.thread.calibrate()
+            #self.thread.calibrate()
 
     @pyqtSlot()
     def establishButtonCenters(self):
@@ -168,6 +173,10 @@ class UIWidget(QtWidgets.QWidget):
         text = str(cursor_dest[0]) + ","  + str(cursor_dest[1])
         self.print_text.setText(text)
         self.setCursor(c)
+
+    @pyqtSlot()
+    def calibrate(self):
+        self.calibrate_pupil_centers.emit()
 
 
 if __name__ == '__main__':

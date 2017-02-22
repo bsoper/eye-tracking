@@ -44,6 +44,9 @@ class TrackingThread(QtCore.QThread):
         for center in centers:
             print(center)
 
+    @pyqtSlot()
+    def calibrate(self):
+        self.center = self.pupil_avg
 
     def startProcessing(self):
         locker = QtCore.QMutexLocker(self.mutex)
@@ -86,9 +89,10 @@ class TrackingThread(QtCore.QThread):
 
         #Emit signal to tell gui thread to move cursor
         self.move_cursor_to_button.emit(closest_entry[1])
+        #self.move_cursor_to_button.emit(cursor_pos)
 
-    def calibrate(self):
-        self.center = self.pupil_avg
+    #def calibrate(self):
+    #    self.center = self.pupil_avg
 
     def findEyeCenter(self,gray_eye, thresh_eye):
         """ findEyeCenter: approximates the center of the pupil by selecting
@@ -255,7 +259,7 @@ class TrackingThread(QtCore.QThread):
                     #Move mouse cursor
                     self.findClosestCenter((avgs[0], avgs[1]))
 
-                    #pyautogui.moveTo(avgs[0], avgs[1])
+                    #pyautogui.moveTo(self.center[0], self.center[1])
 
                     #if avgs[0] - center[0] < -200:
                         #pyautogui.moveTo(200, 500)
@@ -268,10 +272,10 @@ class TrackingThread(QtCore.QThread):
                     #pyautogui.moveTo(avgs[0], avgs[1])
 
                     #Snap cursor to set locations
-                    if avgs[0] - self.center[0] < -200:
-                        pyautogui.moveTo(200, 500)
-                    elif avgs[0] - self.center[0] > 200:
-                        pyautogui.moveTo(1200, 500)
+                    #if avgs[0] - self.center[0] < -200:
+                    #    pyautogui.moveTo(200, 500)
+                    #elif avgs[0] - self.center[0] > 200:
+                    #    pyautogui.moveTo(1200, 500)
 
                     # Uncomment to see location without averaging
                     #cv2.circle(img, (x_scaled, y_scaled), 5, (255,0,255), -1)
