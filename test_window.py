@@ -1,6 +1,7 @@
 from PyQt5 import QtCore as QtCore
 from PyQt5 import QtWidgets as QtWidgets
 from PyQt5 import QtGui as QtGui
+from PyQt5 import QtTest
 from PyQt5.QtCore import *
 import sys
 import cv2
@@ -41,6 +42,7 @@ class UIWidget(QtWidgets.QWidget):
 
         #Send button centers to thread
         self.thread.startProcessing()
+        self.calibrate()
 
     def init_basic_ui(self):
         self.showFullScreen()
@@ -138,20 +140,6 @@ class UIWidget(QtWidgets.QWidget):
 
         if event.text() == 'c':
             self.calibrate()
-            #statusBar = QtWidgets.QStatusBar()
-            #msg_bar.showMessage('Look here to calibrate.')
-            #msg_bar.hideOrShow()
-            #statusBar.showMessage('Look here to calibrate.');
-            #statusBar.show()
-            #time.sleep(1)
-            #statusBar.close()
-
-            #self.calibration_popup = Popup('Calibration')
-            #self.calibration_popup.dispMessage('Look here to calibrate.', 1000)
-            #self.calibration_popup.show()
-            #time.sleep(1)
-            #self.calibration_popup.close()
-            #self.thread.calibrate()
 
     @pyqtSlot()
     def establishButtonCenters(self):
@@ -171,13 +159,16 @@ class UIWidget(QtWidgets.QWidget):
         c.setPos(cursor_dest[0], cursor_dest[1])
         c.setShape(QtCore.Qt.CrossCursor)
         text = str(cursor_dest[0]) + ","  + str(cursor_dest[1])
-        self.print_text.setText(text)
+        #self.print_text.setText(text)
         self.setCursor(c)
 
     @pyqtSlot()
     def calibrate(self):
+        self.print_text.setText('Look here\nto calibrate.')
+        self.print_text.setStyleSheet('color: red; font: bold 24pt')
+        QtTest.QTest.qWait(3000)
         self.calibrate_pupil_centers.emit()
-
+        self.print_text.setText('Calibrated')
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
