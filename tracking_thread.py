@@ -69,18 +69,12 @@ class TrackingThread(QtCore.QThread):
             entry = (mag, center)
             magnitude_vectors.append(entry)
 
-        if self.loop_count < 1:
-            print(magnitude_vectors)
-            self.loop_count += 1
 
         #See which one is closest
         closest_entry = magnitude_vectors[0]
         for entry in magnitude_vectors:
             if(entry[0] < closest_entry[0]):
                 closest_entry = entry
-        if self.loop_count < 2:
-            print("Closest:")
-            print(closest_entry)
 
         #Emit signal to tell gui thread to move cursor
         self.move_cursor_to_button.emit(closest_entry[1])
