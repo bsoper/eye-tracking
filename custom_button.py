@@ -14,6 +14,7 @@ class CustomButton(QtWidgets.QPushButton):
     append_to_text = pyqtSignal(str)
     backspace = pyqtSignal()
     clear_signal = pyqtSignal()
+    speak_signal = pyqtSignal()
 
     def __init__(self, parent=None):
         super(CustomButton, self).__init__(parent)
@@ -76,8 +77,7 @@ class CustomButton(QtWidgets.QPushButton):
         elif(self.content == "Delete"):
             self.backspace.emit()
         elif(self.content == "Done"):
-            ##TODO add a done function that connects to TTS
-            pass
+            self.speak_signal.emit()
         elif(self.content == "Back"):
             self.change_menu_options.emit(str(self.prev_menu))
         elif(self.content == ""):

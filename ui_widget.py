@@ -10,6 +10,8 @@ import math
 import pyautogui
 from tracking_thread import TrackingThread as TrackingThread
 from custom_button import CustomButton
+from gtts import gTTS
+import os
 
 class UIWidget(QtWidgets.QWidget):
 
@@ -148,6 +150,14 @@ class UIWidget(QtWidgets.QWidget):
         self.b4.clear_signal.connect(self.clearText)
         self.b5.clear_signal.connect(self.clearText)
         self.b6.clear_signal.connect(self.clearText)
+
+        #Connect signals of buttons (Done)
+        self.b1.speak_signal.connect(self.speakText)
+        self.b2.speak_signal.connect(self.speakText)
+        self.b3.speak_signal.connect(self.speakText)
+        self.b4.speak_signal.connect(self.speakText)
+        self.b5.speak_signal.connect(self.speakText)
+        self.b6.speak_signal.connect(self.speakText)
 
     def keyPressEvent(self, event):
         if event.text() == 'q':
@@ -296,6 +306,15 @@ class UIWidget(QtWidgets.QWidget):
     def clearText(self):
         text = ""
         self.print_text.setText(text)
+
+
+    @pyqtSlot()
+    def speakText(self):
+        tts = gTTS(text=self.print_text.text(), lang='en')
+        tts.save("text.mp3")
+        os.system("afplay text.mp3")
+        self.clearText()
+
 
     @pyqtSlot()
     def calibrate(self):
