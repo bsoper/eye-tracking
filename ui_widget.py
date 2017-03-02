@@ -1,6 +1,7 @@
 from PyQt5 import QtCore as QtCore
 from PyQt5 import QtWidgets as QtWidgets
 from PyQt5 import QtGui as QtGui
+from PyQt5 import QtTest
 from PyQt5.QtCore import *
 import sys
 import cv2
@@ -14,6 +15,9 @@ class UIWidget(QtWidgets.QWidget):
 
     #Signal to update button center locations in thread
     update_button_centers = pyqtSignal(list)
+
+    #Signal to calibrate pupil center
+    calibrate_pupil_centers = pyqtSignal()
 
     def __init__(self, parent=None):
         super(UIWidget, self).__init__(parent)
@@ -30,12 +34,14 @@ class UIWidget(QtWidgets.QWidget):
         #Pass center information to thread
         self.update_button_centers.connect(self.thread.setButtonCenters)
         self.thread.request_button_centers.connect(self.establishButtonCenters)
+        self.calibrate_pupil_centers.connect(self.thread.calibrate)
 
         #Allow for cursor movement
         self.thread.move_cursor_to_button.connect(self.moveCursor)
 
         #Send button centers to thread
         self.thread.startProcessing()
+        self.calibrate()
 
     def init_ui6(self):
         self.showFullScreen()
@@ -149,6 +155,9 @@ class UIWidget(QtWidgets.QWidget):
 
         if event.text() == 'b':
             self.establishButtonCenters()
+
+        if event.text() == 'c':
+            self.calibrate()
 
     @pyqtSlot()
     def establishButtonCenters(self):
@@ -287,6 +296,18 @@ class UIWidget(QtWidgets.QWidget):
     def clearText(self):
         text = ""
         self.print_text.setText(text)
+
+    @pyqtSlot()
+    def calibrate(self):
+        txt = self.print_text.text()
+        self.print_text.setText('Look here\nto calibrate.')
+        self.print_text.setStyleSheet('color: red; font: bold 24pt')
+        QtTest.QTest.qWait(3000)
+        self.calibrate_pupil_centers.emit()
+        self.print_text.setText('Calibrated')
+        QtTest.QTest.qWait(1000)
+        self.print_text.setStyleSheet('color: black; font: 20pt')
+        self.print_text.setText(txt)
 
     def setPrevMenu(self, prev_menu):
        self.b1.setPrevMenu(prev_menu)
