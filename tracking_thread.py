@@ -47,6 +47,8 @@ class TrackingThread(QtCore.QThread):
     @pyqtSlot()
     def calibrate(self):
         self.center = self.pupil_avg
+        self.x_scale_factor = math.floor(18600 / self.w)
+        self.y_scale_factor = math.floor(18600 / self.w)
 
     def startProcessing(self):
         locker = QtCore.QMutexLocker(self.mutex)
@@ -169,8 +171,6 @@ class TrackingThread(QtCore.QThread):
             #center = [0,0]
             rolling_pupil_avg = collections.deque(maxlen=5)
             blink_count = 0
-            x_scale_factor = 60
-            y_scale_factor = 60
             frame_count = 0
 
             while(cap.isOpened()):
@@ -190,6 +190,7 @@ class TrackingThread(QtCore.QThread):
                 faces = face_cascade.detectMultiScale(img, face_scale_factor, face_min_neighbors)
 
                 for (x,y,w,h) in faces:
+                    self.w = w
                     # Pull face sub-image
                     gray_face = gray[y:y+h, x:x+w]
                     face = img[y:y+h, x:x+w]
@@ -240,8 +241,8 @@ class TrackingThread(QtCore.QThread):
                     # Highlight center.
                     #if have_center:
                     cv2.circle(img, (int(self.center[0]), int(self.center[1])), 2, (255,0,0), -1)
-                    x_scaled = self.center[0] + (self.pupil_avg[0] - self.center[0]) * x_scale_factor
-                    y_scaled = self.center[1] + (self.pupil_avg[1] - self.center[1]) * y_scale_factor
+                    x_scaled = self.center[0] + (self.pupil_avg[0] - self.center[0]) * self.x_scale_factor
+                    y_scaled = self.center[1] + (self.pupil_avg[1] - self.center[1]) * self.y_scale_factor
 
                     rolling_pupil_avg.appendleft((x_scaled, y_scaled))
 
@@ -252,8 +253,10 @@ class TrackingThread(QtCore.QThread):
 
                     #Move mouse cursor
                     self.findClosestCenter((avgs[0], avgs[1]))
+                    #pyautogui.moveTo(avgs[0], avgs[1])
 
                     #pyautogui.moveTo(self.center[0], self.center[1])
+
 
                     #if avgs[0] - center[0] < -200:
                         #pyautogui.moveTo(200, 500)

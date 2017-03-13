@@ -74,13 +74,13 @@ class UIWidget(QtWidgets.QWidget):
 
         #Create layout for top 3 buttons
         b_layout_top = QtWidgets.QHBoxLayout()
-        b_layout_top.addStretch()
+        #b_layout_top.addStretch()
         b_layout_top.addWidget(self.b1)
         b_layout_top.addStretch()
         b_layout_top.addWidget(self.b2)
         b_layout_top.addStretch()
         b_layout_top.addWidget(self.b3)
-        b_layout_top.addStretch()
+        #b_layout_top.addStretch()
 
         #Create layout to contain text
         text_layout = QtWidgets.QHBoxLayout()
@@ -91,23 +91,23 @@ class UIWidget(QtWidgets.QWidget):
 
         #Create layout for bottom 3 buttons
         b_layout_bot = QtWidgets.QHBoxLayout()
-        b_layout_bot.addStretch()
+        #b_layout_bot.addStretch()
         b_layout_bot.addWidget(self.b4)
         b_layout_bot.addStretch()
         b_layout_bot.addWidget(self.b5)
         b_layout_bot.addStretch()
         b_layout_bot.addWidget(self.b6)
-        b_layout_bot.addStretch()
+        #b_layout_bot.addStretch()
 
         #Arrange 3 sublayouts to create whle window layout
         master_layout = QtWidgets.QVBoxLayout()
-        master_layout.addStretch()
+        #master_layout.addStretch()
         master_layout.addLayout(b_layout_top)
         master_layout.addStretch()
         master_layout.addLayout(text_layout)
         master_layout.addStretch()
         master_layout.addLayout(b_layout_bot)
-        master_layout.addStretch()
+        #master_layout.addStretch()
         self.setLayout(master_layout)
 
         #Set the beginning content for each button. The content denotes what
