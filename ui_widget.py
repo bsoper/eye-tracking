@@ -59,10 +59,10 @@ class UIWidget(QtWidgets.QWidget):
         #Resize the buttons - they will all be squares
         b_width = self.frameGeometry().width() / 4.0
         b_height = self.frameGeometry().height() / 4.0
-        if(b_width > 300):
-            b_width = 300
-        if(b_height > 300):
-            b_width = 300
+        #if(b_width > 300):
+        #    b_width = 300
+        #if(b_height > 300):
+        #    b_width = 300
 
         self.b1.setFixedSize(b_width, b_height)
         self.b2.setFixedSize(b_width, b_height)
@@ -185,8 +185,8 @@ class UIWidget(QtWidgets.QWidget):
     def moveCursor(self, cursor_dest):
         c = QtGui.QCursor()
         c.setPos(cursor_dest[0], cursor_dest[1])
-        c.setShape(QtCore.Qt.CrossCursor)
-        self.setCursor(c)
+        #c.setShape(QtCore.Qt.CrossCursor)
+        #self.setCursor(c)
 
     @pyqtSlot(str)
     def changeMenu(self, button_content):

@@ -30,6 +30,10 @@ class TrackingThread(QtCore.QThread):
         self.center = None
         self.pupil_avg = None
 
+        pyautogui.FAILSAFE = False
+        self.screen_x, self.screen_y = pyautogui.size()
+        self.prev_pos = (0,0)
+
     def __del__(self):
         self.mutex.lock()
         self.abort = True
@@ -41,14 +45,14 @@ class TrackingThread(QtCore.QThread):
     @pyqtSlot(list)
     def setButtonCenters(self, centers):
         self.button_centers = centers
-        for center in centers:
-            print(center)
+        #for center in centers:
+        #    print(center)
 
     @pyqtSlot()
     def calibrate(self):
         self.center = self.pupil_avg
-        self.x_scale_factor = math.floor(18600 / self.w)
-        self.y_scale_factor = math.floor(18600 / self.w)
+        self.x_scale_factor = math.floor(30000 / self.w) # 18600
+        self.y_scale_factor = math.floor(30000 / self.w)
 
     def startProcessing(self):
         locker = QtCore.QMutexLocker(self.mutex)
@@ -67,7 +71,7 @@ class TrackingThread(QtCore.QThread):
             b_x = center[0]
             b_y = center[1]
             c_x = cursor_pos[0]
-            c_y = cursor_pos[1]
+            c_y = cursor_pos[1] + 100
 
             delta_x = abs(c_x - b_x)/1000
             delta_y = abs(c_y - b_y)/1000
@@ -83,12 +87,18 @@ class TrackingThread(QtCore.QThread):
             if(entry[0] < closest_entry[0]):
                 closest_entry = entry
 
-        #Emit signal to tell gui thread to move cursor
-        self.move_cursor_to_button.emit(closest_entry[1])
-        #self.move_cursor_to_button.emit(cursor_pos)
+        # Adjust cursor so it is not on text
+        position = (closest_entry[1][0], closest_entry[1][1] + 30)
+        if position == self.prev_pos:
+            return
+        else:
+            self.prev_pos = position
 
-    #def calibrate(self):
-    #    self.center = self.pupil_avg
+            #Emit signal to tell gui thread to move cursor
+            #self.move_cursor_to_button.emit(closest_entry[1])
+            #self.move_cursor_to_button.emit(cursor_pos)
+            #self.move_cursor_to_button.emit(position)
+            pyautogui.moveTo(position[0], position[1], 0.2)
 
     def findEyeCenter(self,gray_eye, thresh_eye):
         """ findEyeCenter: approximates the center of the pupil by selecting
@@ -250,6 +260,17 @@ class TrackingThread(QtCore.QThread):
                     avgs = [a / len(rolling_pupil_avg) for a in avgs]
 
                     cv2.circle(img, (int(avgs[0]), int(avgs[1])), 5, (0,0,255), -1)
+
+                    # Bound mouse position by edges of screen
+                    if avgs[0] < 0:
+                        avgs[0] = 0
+                    elif avgs[0] > self.screen_x:
+                        avgs[0] = self.screen_x
+
+                    if avgs[1] < 0:
+                        avgs[1] = 0
+                    elif avgs[1] > self.screen_y:
+                        avgs[1] = self.screen_y
 
                     #Move mouse cursor
                     self.findClosestCenter((avgs[0], avgs[1]))
