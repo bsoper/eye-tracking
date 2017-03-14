@@ -33,6 +33,7 @@ class TrackingThread(QtCore.QThread):
         pyautogui.FAILSAFE = False
         self.screen_x, self.screen_y = pyautogui.size()
         self.prev_pos = (0,0)
+        self.num_new_pos = 0
 
     def __del__(self):
         self.mutex.lock()
@@ -91,8 +92,11 @@ class TrackingThread(QtCore.QThread):
         position = (closest_entry[1][0], closest_entry[1][1] + 30)
         if position == self.prev_pos:
             return
+        elif self.num_new_pos < 3:
+            self.num_new_pos += 1
         else:
             self.prev_pos = position
+            self.num_new_pos = 0
 
             #Emit signal to tell gui thread to move cursor
             #self.move_cursor_to_button.emit(closest_entry[1])
