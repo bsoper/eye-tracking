@@ -310,6 +310,8 @@ class UIWidget(QtWidgets.QWidget):
 
     @pyqtSlot()
     def speakText(self):
+        if self.print_text.text() == '':
+            return
         tts = gTTS(text=self.print_text.text(), lang='en')
         tts.save("text.mp3")
         os.system("afplay text.mp3")
