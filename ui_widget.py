@@ -22,6 +22,8 @@ class UIWidget(QtWidgets.QWidget):
     calibrate_pupil_centers = pyqtSignal()
 
     def __init__(self, parent=None):
+        """**Deprecated** Used to initialize user interface"""
+
         super(UIWidget, self).__init__(parent)
 
         #Set widget params
@@ -46,6 +48,13 @@ class UIWidget(QtWidgets.QWidget):
         self.calibrate()
 
     def init_ui6(self):
+        """Used to initialize a user interface with 6 buttons
+
+        **This is the main initialization for our project -- initialization
+        with any other button amounts will require considerable code alterations
+        throughout rest of project**
+
+        """
         self.showFullScreen()
 
         #Make six buttons for our layout
@@ -59,10 +68,6 @@ class UIWidget(QtWidgets.QWidget):
         #Resize the buttons - they will all be squares
         b_width = self.frameGeometry().width() / 4.0
         b_height = self.frameGeometry().height() / 4.0
-        #if(b_width > 300):
-        #    b_width = 300
-        #if(b_height > 300):
-        #    b_width = 300
 
         self.b1.setFixedSize(b_width, b_height)
         self.b2.setFixedSize(b_width, b_height)
@@ -71,95 +76,28 @@ class UIWidget(QtWidgets.QWidget):
         self.b5.setFixedSize(b_width, b_height)
         self.b6.setFixedSize(b_width, b_height)
 
-
-        #Create layout for top 3 buttons
-        b_layout_top = QtWidgets.QHBoxLayout()
-        #b_layout_top.addStretch()
-        b_layout_top.addWidget(self.b1)
-        b_layout_top.addStretch()
-        b_layout_top.addWidget(self.b2)
-        b_layout_top.addStretch()
-        b_layout_top.addWidget(self.b3)
-        #b_layout_top.addStretch()
-
-        #Create layout to contain text
-        text_layout = QtWidgets.QHBoxLayout()
-        self.print_text = QtWidgets.QLabel()
-        text_layout.addStretch()
-        text_layout.addWidget(self.print_text)
-        text_layout.addStretch()
-
-        #Create layout for bottom 3 buttons
-        b_layout_bot = QtWidgets.QHBoxLayout()
-        #b_layout_bot.addStretch()
-        b_layout_bot.addWidget(self.b4)
-        b_layout_bot.addStretch()
-        b_layout_bot.addWidget(self.b5)
-        b_layout_bot.addStretch()
-        b_layout_bot.addWidget(self.b6)
-        #b_layout_bot.addStretch()
-
-        #Arrange 3 sublayouts to create whle window layout
-        master_layout = QtWidgets.QVBoxLayout()
-        #master_layout.addStretch()
-        master_layout.addLayout(b_layout_top)
-        master_layout.addStretch()
-        master_layout.addLayout(text_layout)
-        master_layout.addStretch()
-        master_layout.addLayout(b_layout_bot)
-        #master_layout.addStretch()
-        self.setLayout(master_layout)
+        #Create screen layout
+        self.createSixButtonLayout()
 
         #Set the beginning content for each button. The content denotes what
         #function that button will have.
-        self.b1.setContent("A-E")
-        self.b2.setContent("F-J")
-        self.b3.setContent("K-O")
-        self.b4.setContent("P-T")
-        self.b5.setContent("U-Y")
-        self.b6.setContent("Z, Actions")
+        self.setMenuButtonContent("Letters","Numbers","Space","Confirm",
+                                    "Phrases","Backspace")
 
-        #Connect signals of buttons (changing menus)
-        self.b1.change_menu_options.connect(self.changeMenu)
-        self.b2.change_menu_options.connect(self.changeMenu)
-        self.b3.change_menu_options.connect(self.changeMenu)
-        self.b4.change_menu_options.connect(self.changeMenu)
-        self.b5.change_menu_options.connect(self.changeMenu)
-        self.b6.change_menu_options.connect(self.changeMenu)
-
-        #Connect signals of buttons (appending text)
-        self.b1.append_to_text.connect(self.appendText)
-        self.b2.append_to_text.connect(self.appendText)
-        self.b3.append_to_text.connect(self.appendText)
-        self.b4.append_to_text.connect(self.appendText)
-        self.b5.append_to_text.connect(self.appendText)
-        self.b6.append_to_text.connect(self.appendText)
-
-        #Connect signals of buttons (backspace)
-        self.b1.backspace.connect(self.backspace)
-        self.b2.backspace.connect(self.backspace)
-        self.b3.backspace.connect(self.backspace)
-        self.b4.backspace.connect(self.backspace)
-        self.b5.backspace.connect(self.backspace)
-        self.b6.backspace.connect(self.backspace)
-
-        #Connect signals of buttons (clear)
-        self.b1.clear_signal.connect(self.clearText)
-        self.b2.clear_signal.connect(self.clearText)
-        self.b3.clear_signal.connect(self.clearText)
-        self.b4.clear_signal.connect(self.clearText)
-        self.b5.clear_signal.connect(self.clearText)
-        self.b6.clear_signal.connect(self.clearText)
-
-        #Connect signals of buttons (Done)
-        self.b1.speak_signal.connect(self.speakText)
-        self.b2.speak_signal.connect(self.speakText)
-        self.b3.speak_signal.connect(self.speakText)
-        self.b4.speak_signal.connect(self.speakText)
-        self.b5.speak_signal.connect(self.speakText)
-        self.b6.speak_signal.connect(self.speakText)
+        #Connect signals of buttons
+        self.connectChangeMenuOptionsSignal()
+        self.connectAppendToTextSignal()
+        self.connectBackspaceSignal()
+        self.connectClearSignal()
+        self.connectSpeakTextSignal()
 
     def keyPressEvent(self, event):
+        """
+        Called when a key is pressed while ui is in focus. Overloaded Qt
+        function -- do not usually call this ourselves.
+
+        :param event: The key press event which triggers this function.
+        """
         if event.text() == 'q':
             QtWidgets.QApplication.quit()
 
@@ -171,6 +109,13 @@ class UIWidget(QtWidgets.QWidget):
 
     @pyqtSlot()
     def establishButtonCenters(self):
+        """Calculates the center positions of the six buttons on screen.
+
+        Emits the update_button_centers
+
+        .. seealso::update_button_centers
+        """
+
         ###Used to create list of button centers
         buttons = [self.b1, self.b2, self.b3, self.b4, self.b5, self.b6]
         for button in buttons:
@@ -183,114 +128,74 @@ class UIWidget(QtWidgets.QWidget):
 
     @pyqtSlot(tuple)
     def moveCursor(self, cursor_dest):
+        """Moves the mouse cursor to the destination
+
+        :param cursor_dest: The x,y pixel destination of mouse cursor
+        :type cursor_dest: tuple: (float,float)
+        """
         c = QtGui.QCursor()
         c.setPos(cursor_dest[0], cursor_dest[1])
         #c.setShape(QtCore.Qt.CrossCursor)
         #self.setCursor(c)
 
+
     @pyqtSlot(str)
     def changeMenu(self, button_content):
+        """The mechanism by which we change the menu currently displayed on screen
+
+        :param button_content: The function associated with the button that emitted this signal
+        :type button_content: str
+        """
         if(button_content == "main"):
-            self.b1.setContent("A-E")
-            self.b2.setContent("F-J")
-            self.b3.setContent("K-O")
-            self.b4.setContent("P-T")
-            self.b5.setContent("U-Y")
-            self.b6.setContent("Z, Actions")
+            self.setMenuButtonContent("Letters","Numbers","Space",
+                    "Confirm","Phrases","Backspace")
+
+        if(button_content == "Letters"):
+            self.setMenuButtonContent("A-E","F-J","K-O","P-T","Back","U-Z")
 
         if(button_content == "A-E"):
-            self.b1.setContent("A")
-            self.b2.setContent("B")
-            self.b3.setContent("C")
-            self.b4.setContent("D")
-            self.b5.setContent("E")
-            self.b6.setContent("Back")
-            self.setPrevMenu("main")
+            self.setMenuButtonContent("A","B","C","D","Back","E")
+            self.setPrevMenu("Letters")
 
         if(button_content == "F-J"):
-            self.b1.setContent("F")
-            self.b2.setContent("G")
-            self.b3.setContent("H")
-            self.b4.setContent("I")
-            self.b5.setContent("J")
-            self.b6.setContent("Back")
-            self.setPrevMenu("main")
+            self.setMenuButtonConent("F","G","H","I","Back","J")
+            self.setPrevMenu("Letters")
 
         if(button_content == "K-O"):
-            self.b1.setContent("K")
-            self.b2.setContent("L")
-            self.b3.setContent("M")
-            self.b4.setContent("N")
-            self.b5.setContent("O")
-            self.b6.setContent("Back")
-            self.setPrevMenu("main")
-
+            self.setMenuButtonContent("K","L","M","N","Back","O")
+            self.setPrevMenu("Letters")
 
         if(button_content == "P-T"):
-            self.b1.setContent("P")
-            self.b2.setContent("Q")
-            self.b3.setContent("R")
-            self.b4.setContent("S")
-            self.b5.setContent("T")
-            self.b6.setContent("Back")
-            self.setPrevMenu("main")
+            self.setMenuButtonContent("P","Q","R","S","Back","T")
+            self.setPrevMenu("Letters")
 
-        if(button_content == "U-Y"):
-            self.b1.setContent("U")
-            self.b2.setContent("V")
-            self.b3.setContent("W")
-            self.b4.setContent("X")
-            self.b5.setContent("Y")
-            self.b6.setContent("Back")
-            self.setPrevMenu("main")
+        if(button_content == "U-Z"):
+            self.setMenuButtonContent("U","V","W","X","Back","X,Z")
+            self.setPrevMenu("Letters")
 
-        if(button_content == "Z, Actions"):
-            self.b1.setContent("Z")
-            self.b2.setContent("Numbers")
-            self.b3.setContent("Symbols")
-            self.b4.setContent("Space")
-            self.b5.setContent("Shift, Delete, Clear, Done")
-            self.b6.setContent("Back")
-            self.setPrevMenu("main")
-
-        if(button_content == "Shift, Delete, Clear, Done"):
-            self.b1.setContent("Shift")
-            self.b2.setContent("Delete")
-            self.b3.setContent("Clear")
-            self.b4.setContent("Done")
-            self.b5.setContent("")
-            self.b6.setContent("Back")
-            self.setPrevMenu("Z, Actions")
+        if(button_content == "X,Z"):
+            self.setMenuButtonContent("X","Z","","","Back","")
+            self.setPrevMenu("U-Z")
 
         if(button_content == "Numbers"):
-            self.b1.setContent("0-4")
-            self.b2.setContent("5-9")
-            self.b3.setContent("")
-            self.b4.setContent("")
-            self.b5.setContent("")
-            self.b6.setContent("Back")
-            self.setPrevMenu("Z, Actions")
+            self.setMenuButtonContent("0-4","5-9","","","Back","")
+            self.setPrevMenu("main")
 
         if(button_content == "0-4"):
-            self.b1.setContent("0")
-            self.b2.setContent("1")
-            self.b3.setContent("2")
-            self.b4.setContent("3")
-            self.b5.setContent("4")
-            self.b6.setContent("Back")
-            self.setPrevMenu("Z, Actions")
+            self.setMenuButtonContent("0","1","2",'3','Back','4')
+            self.setPrevMenu("Numbers")
 
         if(button_content == "5-9"):
-            self.b1.setContent("5")
-            self.b2.setContent("6")
-            self.b3.setContent("7")
-            self.b4.setContent("8")
-            self.b5.setContent("9")
-            self.b6.setContent("Back")
-            self.setPrevMenu("Z, Actions")
+            self.setMenuButtonContent('5','6','7','8','Back','9')
+            self.setPrevMenu("Numbers")
 
     @pyqtSlot(str)
     def appendText(self, val):
+        """Slotted Qt Function: Appends passed text to the communication string
+
+        :param val: The string to append to the communication string
+        :type val: str
+        """
         if(val == 'Space'):
             val = " "
         text = self.print_text.text() + val
@@ -298,18 +203,27 @@ class UIWidget(QtWidgets.QWidget):
 
     @pyqtSlot()
     def backspace(self):
+        """
+        Slotted Qt Function: Backspaces the last character added to communication string
+        """
         if(len(self.print_text.text()) > 0):
                 text = self.print_text.text() [:-1]
                 self.print_text.setText(text)
 
     @pyqtSlot()
     def clearText(self):
+        """
+        Slotted Qt Function: Completely clears communication string
+        """
         text = ""
         self.print_text.setText(text)
 
 
     @pyqtSlot()
     def speakText(self):
+        """
+        Slotted Qt Function: Calls TTS function to speak communication string
+        """
         if self.print_text.text() == '':
             return
         tts = gTTS(text=self.print_text.text(), lang='en')
@@ -320,6 +234,10 @@ class UIWidget(QtWidgets.QWidget):
 
     @pyqtSlot()
     def calibrate(self):
+        """
+        Slotted Qt Function: Recalibrates pupil tracker in case head moves too
+        much to accurately track eyes
+        """
         txt = self.print_text.text()
         self.print_text.setText('Look here\nto calibrate.')
         self.print_text.setStyleSheet('color: red; font: bold 24pt')
@@ -331,13 +249,135 @@ class UIWidget(QtWidgets.QWidget):
         self.print_text.setText(txt)
 
     def setPrevMenu(self, prev_menu):
-       self.b1.setPrevMenu(prev_menu)
-       self.b2.setPrevMenu(prev_menu)
-       self.b3.setPrevMenu(prev_menu)
-       self.b4.setPrevMenu(prev_menu)
-       self.b5.setPrevMenu(prev_menu)
-       self.b6.setPrevMenu(prev_menu)
+        """
+        Sets the previous menu of the buttons in the current menu
 
+        :param prev_menu: The previous menu to set for button
+        :type prev_menu: str
+        """
+        self.b1.setPrevMenu(prev_menu)
+        self.b2.setPrevMenu(prev_menu)
+        self.b3.setPrevMenu(prev_menu)
+        self.b4.setPrevMenu(prev_menu)
+        self.b5.setPrevMenu(prev_menu)
+        self.b6.setPrevMenu(prev_menu)
+
+    def connectClearSignal(self):
+        """
+        Connects the clear_signal signal to all buttons
+        """
+        self.b1.clear_signal.connect(self.clearText)
+        self.b2.clear_signal.connect(self.clearText)
+        self.b3.clear_signal.connect(self.clearText)
+        self.b4.clear_signal.connect(self.clearText)
+        self.b5.clear_signal.connect(self.clearText)
+        self.b6.clear_signal.connect(self.clearText)
+
+    def connectBackspaceSignal(self):
+        """
+        Connects the backspace signal to all buttons
+        """
+        self.b1.backspace.connect(self.backspace)
+        self.b2.backspace.connect(self.backspace)
+        self.b3.backspace.connect(self.backspace)
+        self.b4.backspace.connect(self.backspace)
+        self.b5.backspace.connect(self.backspace)
+        self.b6.backspace.connect(self.backspace)
+
+    def connectAppendToTextSignal(self):
+        """
+        Connects the append_to_text signal to all buttons
+        """
+        self.b1.append_to_text.connect(self.appendText)
+        self.b2.append_to_text.connect(self.appendText)
+        self.b3.append_to_text.connect(self.appendText)
+        self.b4.append_to_text.connect(self.appendText)
+        self.b5.append_to_text.connect(self.appendText)
+        self.b6.append_to_text.connect(self.appendText)
+
+    def connectChangeMenuOptionsSignal(self):
+        """
+        Connects the change_menu_options signal to all buttons
+        """
+        self.b1.change_menu_options.connect(self.changeMenu)
+        self.b2.change_menu_options.connect(self.changeMenu)
+        self.b3.change_menu_options.connect(self.changeMenu)
+        self.b4.change_menu_options.connect(self.changeMenu)
+        self.b5.change_menu_options.connect(self.changeMenu)
+        self.b6.change_menu_options.connect(self.changeMenu)
+
+    def connectSpeakTextSignal(self):
+        """
+        Connects the speak_signal signal to all buttons
+        """
+        self.b1.speak_signal.connect(self.speakText)
+        self.b2.speak_signal.connect(self.speakText)
+        self.b3.speak_signal.connect(self.speakText)
+        self.b4.speak_signal.connect(self.speakText)
+        self.b5.speak_signal.connect(self.speakText)
+        self.b6.speak_signal.connect(self.speakText)
+
+    def setMenuButtonContent(self, b1_text, b2_text, b3_text, b4_text, b5_text,
+            b6_text):
+        """
+        Sets the button content for each button in currently displayed menu.
+
+        :param b1_text: Content of button 1 (top left corner)
+        :param b2_text: Content of button 2 (top middle)
+        :param b3_text: Content of button 3 (top right corner)
+        :param b4_text: Content of button 4 (bottom left corner)
+        :param b5_text: Content of button 5 (bottom middle)
+        :param b6_text: Content of button 6 (bottom right corner)
+
+        :type b1_text: str
+        :type b2_text: str
+        :type b3_text: str
+        :type b4_text: str
+        :type b5_text: str
+        :type b6_text: str
+        """
+        self.b1.setContent(b1_text)
+        self.b2.setContent(b2_text)
+        self.b3.setContent(b3_text)
+        self.b4.setContent(b4_text)
+        self.b5.setContent(b5_text)
+        self.b6.setContent(b6_text)
+
+    def createSixButtonLayout(self):
+        """
+        Creates a screen layout for the ui with six buttons
+        """
+        #Create layout for top 3 buttons
+        b_layout_top = QtWidgets.QHBoxLayout()
+        b_layout_top.addWidget(self.b1)
+        b_layout_top.addStretch()
+        b_layout_top.addWidget(self.b2)
+        b_layout_top.addStretch()
+        b_layout_top.addWidget(self.b3)
+
+        #Create layout to contain text
+        text_layout = QtWidgets.QHBoxLayout()
+        self.print_text = QtWidgets.QLabel()
+        text_layout.addStretch()
+        text_layout.addWidget(self.print_text)
+        text_layout.addStretch()
+
+        #Create layout for bottom 3 buttons
+        b_layout_bot = QtWidgets.QHBoxLayout()
+        b_layout_bot.addWidget(self.b4)
+        b_layout_bot.addStretch()
+        b_layout_bot.addWidget(self.b5)
+        b_layout_bot.addStretch()
+        b_layout_bot.addWidget(self.b6)
+
+        #Arrange 3 sublayouts to create master layout for entire window
+        master_layout = QtWidgets.QVBoxLayout()
+        master_layout.addLayout(b_layout_top)
+        master_layout.addStretch()
+        master_layout.addLayout(text_layout)
+        master_layout.addStretch()
+        master_layout.addLayout(b_layout_bot)
+        self.setLayout(master_layout)
 
 
 if __name__ == '__main__':

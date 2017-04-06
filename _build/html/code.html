@@ -1,0 +1,479 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>CODE DOCUMENTATION &#8212; Pupil Tracker 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Welcome to Pupil Tracker’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="code-documentation">
+<h1>CODE DOCUMENTATION<a class="headerlink" href="#code-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-ui_widget">
+<span id="ui-widget-documentation"></span><h2>UI Widget Documentation<a class="headerlink" href="#module-ui_widget" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="ui_widget.UIWidget">
+<em class="property">class </em><code class="descclassname">ui_widget.</code><code class="descname">UIWidget</code><span class="sig-paren">(</span><em>parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#ui_widget.UIWidget" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="ui_widget.UIWidget.appendText">
+<code class="descname">appendText</code><span class="sig-paren">(</span><em>val</em><span class="sig-paren">)</span><a class="headerlink" href="#ui_widget.UIWidget.appendText" title="Permalink to this definition">¶</a></dt>
+<dd><p>Slotted Qt Function: Appends passed text to the communication string</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>val</strong> (<em>str</em>) &#8211; The string to append to the communication string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ui_widget.UIWidget.backspace">
+<code class="descname">backspace</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ui_widget.UIWidget.backspace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Slotted Qt Function: Backspaces the last character added to communication string</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ui_widget.UIWidget.calibrate">
+<code class="descname">calibrate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ui_widget.UIWidget.calibrate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Slotted Qt Function: Recalibrates pupil tracker in case head moves too
+much to accurately track eyes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ui_widget.UIWidget.changeMenu">
+<code class="descname">changeMenu</code><span class="sig-paren">(</span><em>button_content</em><span class="sig-paren">)</span><a class="headerlink" href="#ui_widget.UIWidget.changeMenu" title="Permalink to this definition">¶</a></dt>
+<dd><p>The mechanism by which we change the menu currently displayed on screen</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>button_content</strong> (<em>str</em>) &#8211; The function associated with the button that emitted this signal</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ui_widget.UIWidget.clearText">
+<code class="descname">clearText</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ui_widget.UIWidget.clearText" title="Permalink to this definition">¶</a></dt>
+<dd><p>Slotted Qt Function: Completely clears communication string</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ui_widget.UIWidget.connectAppendToTextSignal">
+<code class="descname">connectAppendToTextSignal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ui_widget.UIWidget.connectAppendToTextSignal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connects the append_to_text signal to all buttons</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ui_widget.UIWidget.connectBackspaceSignal">
+<code class="descname">connectBackspaceSignal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ui_widget.UIWidget.connectBackspaceSignal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connects the backspace signal to all buttons</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ui_widget.UIWidget.connectChangeMenuOptionsSignal">
+<code class="descname">connectChangeMenuOptionsSignal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ui_widget.UIWidget.connectChangeMenuOptionsSignal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connects the change_menu_options signal to all buttons</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ui_widget.UIWidget.connectClearSignal">
+<code class="descname">connectClearSignal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ui_widget.UIWidget.connectClearSignal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connects the clear_signal signal to all buttons</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ui_widget.UIWidget.connectSpeakTextSignal">
+<code class="descname">connectSpeakTextSignal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ui_widget.UIWidget.connectSpeakTextSignal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connects the speak_signal signal to all buttons</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ui_widget.UIWidget.createSixButtonLayout">
+<code class="descname">createSixButtonLayout</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ui_widget.UIWidget.createSixButtonLayout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a screen layout for the ui with six buttons</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ui_widget.UIWidget.establishButtonCenters">
+<code class="descname">establishButtonCenters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ui_widget.UIWidget.establishButtonCenters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the center positions of the six buttons on screen.</p>
+<p>Emits the update_button_centers</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ui_widget.UIWidget.init_ui6">
+<code class="descname">init_ui6</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ui_widget.UIWidget.init_ui6" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to initialize a user interface with 6 buttons</p>
+<p><strong>This is the main initialization for our project &#8211; initialization
+with any other button amounts will require considerable code alterations
+throughout rest of project</strong></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ui_widget.UIWidget.keyPressEvent">
+<code class="descname">keyPressEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="headerlink" href="#ui_widget.UIWidget.keyPressEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when a key is pressed while ui is in focus. Overloaded Qt
+function &#8211; do not usually call this ourselves.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; The key press event which triggers this function.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ui_widget.UIWidget.moveCursor">
+<code class="descname">moveCursor</code><span class="sig-paren">(</span><em>cursor_dest</em><span class="sig-paren">)</span><a class="headerlink" href="#ui_widget.UIWidget.moveCursor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Moves the mouse cursor to the destination</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cursor_dest</strong> (<em>tuple:</em><em> (</em><em>float</em><em>,</em><em>float</em><em>)</em><em></em>) &#8211; The x,y pixel destination of mouse cursor</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ui_widget.UIWidget.setMenuButtonContent">
+<code class="descname">setMenuButtonContent</code><span class="sig-paren">(</span><em>b1_text</em>, <em>b2_text</em>, <em>b3_text</em>, <em>b4_text</em>, <em>b5_text</em>, <em>b6_text</em><span class="sig-paren">)</span><a class="headerlink" href="#ui_widget.UIWidget.setMenuButtonContent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the button content for each button in currently displayed menu.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>b1_text</strong> (<em>str</em>) &#8211; Content of button 1 (top left corner)</li>
+<li><strong>b2_text</strong> (<em>str</em>) &#8211; Content of button 2 (top middle)</li>
+<li><strong>b3_text</strong> (<em>str</em>) &#8211; Content of button 3 (top right corner)</li>
+<li><strong>b4_text</strong> (<em>str</em>) &#8211; Content of button 4 (bottom left corner)</li>
+<li><strong>b5_text</strong> (<em>str</em>) &#8211; Content of button 5 (bottom middle)</li>
+<li><strong>b6_text</strong> (<em>str</em>) &#8211; Content of button 6 (bottom right corner)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ui_widget.UIWidget.setPrevMenu">
+<code class="descname">setPrevMenu</code><span class="sig-paren">(</span><em>prev_menu</em><span class="sig-paren">)</span><a class="headerlink" href="#ui_widget.UIWidget.setPrevMenu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the previous menu of the buttons in the current menu</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>prev_menu</strong> (<em>str</em>) &#8211; The previous menu to set for button</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ui_widget.UIWidget.speakText">
+<code class="descname">speakText</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ui_widget.UIWidget.speakText" title="Permalink to this definition">¶</a></dt>
+<dd><p>Slotted Qt Function: Calls TTS function to speak communication string</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-custom_button">
+<span id="custom-button-documentation"></span><h2>Custom Button Documentation<a class="headerlink" href="#module-custom_button" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="custom_button.CustomButton">
+<em class="property">class </em><code class="descclassname">custom_button.</code><code class="descname">CustomButton</code><span class="sig-paren">(</span><em>parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#custom_button.CustomButton" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="custom_button.CustomButton.buttonClicked">
+<code class="descname">buttonClicked</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#custom_button.CustomButton.buttonClicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Slotted function that performs various actions when a button is clicked.</p>
+<p>It is essentially a massive switch/case statement that performs functions
+based off of the buttons self.button_content</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="custom_button.CustomButton.buttonReleased">
+<code class="descname">buttonReleased</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#custom_button.CustomButton.buttonReleased" title="Permalink to this definition">¶</a></dt>
+<dd><p>Slotted Qt Function: Called when button is released after being clicked</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="custom_button.CustomButton.enterEvent">
+<code class="descname">enterEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="headerlink" href="#custom_button.CustomButton.enterEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when mouse hovers over button</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; Mouse Enter Event called when mouse hovers over button</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="custom_button.CustomButton.leaveEvent">
+<code class="descname">leaveEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="headerlink" href="#custom_button.CustomButton.leaveEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when mouse leaves button</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; Mouse Leave Event called when mouse leaves button</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="custom_button.CustomButton.setContent">
+<code class="descname">setContent</code><span class="sig-paren">(</span><em>val</em><span class="sig-paren">)</span><a class="headerlink" href="#custom_button.CustomButton.setContent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the content of the button. The content denotes what the function the
+button will perform when clicked</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>val</strong> (<em>str</em>) &#8211; The content to be assigned to the button</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="custom_button.CustomButton.setPrevMenu">
+<code class="descname">setPrevMenu</code><span class="sig-paren">(</span><em>prev</em><span class="sig-paren">)</span><a class="headerlink" href="#custom_button.CustomButton.setPrevMenu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the previous menu of the button</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>prev_menu</strong> (<em>str</em>) &#8211; The previous menu</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tracking_thread">
+<span id="tracking-thread-documentation"></span><h2>Tracking Thread Documentation<a class="headerlink" href="#module-tracking_thread" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tracking_thread.TrackingThread">
+<em class="property">class </em><code class="descclassname">tracking_thread.</code><code class="descname">TrackingThread</code><span class="sig-paren">(</span><em>parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#tracking_thread.TrackingThread" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="tracking_thread.TrackingThread.calibrate">
+<code class="descname">calibrate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tracking_thread.TrackingThread.calibrate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Qt Slotted function to calibrate tracking mechanism based off of user
+eye position</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tracking_thread.TrackingThread.findClosestCenter">
+<code class="descname">findClosestCenter</code><span class="sig-paren">(</span><em>cursor_pos</em><span class="sig-paren">)</span><a class="headerlink" href="#tracking_thread.TrackingThread.findClosestCenter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the closest button center to the current mouse position</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cursor_pos</strong> (<em>tuple</em><em> (</em><em>float</em><em>,</em><em>float</em><em>)</em><em></em>) &#8211; The x,y position of the mouse cursor</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="tracking_thread.TrackingThread.findEyeCenter">
+<code class="descname">findEyeCenter</code><span class="sig-paren">(</span><em>gray_eye</em>, <em>thresh_eye</em><span class="sig-paren">)</span><a class="headerlink" href="#tracking_thread.TrackingThread.findEyeCenter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Approximates the center of the pupil by selecting
+the darkest point in gray_eye that is within the blob detected in
+thresh_eye</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>gray_eye</strong> &#8211; Gray-scale image of eye</li>
+<li><strong>thresh_eye</strong> &#8211; binary eye image with contours filled in</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The pixel location of pupil center</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tuple(int,int)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="tracking_thread.TrackingThread.getPupilAvgFromFace">
+<code class="descname">getPupilAvgFromFace</code><span class="sig-paren">(</span><em>gray_face</em>, <em>eyes</em>, <em>x</em>, <em>y</em>, <em>w</em>, <em>h</em><span class="sig-paren">)</span><a class="headerlink" href="#tracking_thread.TrackingThread.getPupilAvgFromFace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a grey version of face image, a list of eyes, and the x, y, w, h,
+coordinates of the face. Returns a list [x, y] for the average between
+the eyes contained in the list.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>gray_face</strong> &#8211; A gray-scale version of the face image</li>
+<li><strong>eyes</strong> &#8211; A list of eyes located within image</li>
+<li><strong>x</strong> &#8211; The x coordinate of the face</li>
+<li><strong>y</strong> &#8211; The y coordinate of the face</li>
+<li><strong>w</strong> &#8211; The width of the face</li>
+<li><strong>h</strong> &#8211; The height of the face</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The average center position of the eyes in the list</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tuple(int,int)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="tracking_thread.TrackingThread.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tracking_thread.TrackingThread.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when this thread begins to run. Image processing done within
+this function.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tracking_thread.TrackingThread.setButtonCenters">
+<code class="descname">setButtonCenters</code><span class="sig-paren">(</span><em>centers</em><span class="sig-paren">)</span><a class="headerlink" href="#tracking_thread.TrackingThread.setButtonCenters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Qt Signal to set button centers list based off of centers passed
+by signal emitter</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>centers</strong> (<em>list</em><em>[</em><em>tuple</em><em>(</em><em>float</em><em>,</em><em>float</em><em>)</em><em></em><em>]</em><em></em>) &#8211; The list of button centers</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="tracking_thread.TrackingThread.startProcessing">
+<code class="descname">startProcessing</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tracking_thread.TrackingThread.startProcessing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function called when this thread begins</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">CODE DOCUMENTATION</a><ul>
+<li><a class="reference internal" href="#module-ui_widget">UI Widget Documentation</a></li>
+<li><a class="reference internal" href="#module-custom_button">Custom Button Documentation</a></li>
+<li><a class="reference internal" href="#module-tracking_thread">Tracking Thread Documentation</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to Pupil Tracker&#8217;s documentation!</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/code.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Nathan Casale and Benjamin Soper.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/code.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

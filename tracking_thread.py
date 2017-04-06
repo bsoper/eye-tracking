@@ -14,6 +14,10 @@ class TrackingThread(QtCore.QThread):
     move_cursor_to_button = pyqtSignal(tuple)
 
     def __init__(self, parent=None):
+        """
+        Initializes tracking thread - a child of QThread to be used in
+        conjunction with the ui_widget
+        """
         super(TrackingThread, self).__init__(parent)
 
         #Values required to run thread
@@ -36,6 +40,9 @@ class TrackingThread(QtCore.QThread):
         self.num_new_pos = 0
 
     def __del__(self):
+        """
+        Deletes the thread when destruction is required
+        """
         self.mutex.lock()
         self.abort = True
         self.condition.wakeOne()
@@ -45,17 +52,31 @@ class TrackingThread(QtCore.QThread):
 
     @pyqtSlot(list)
     def setButtonCenters(self, centers):
+        """
+        Qt Signal to set button centers list based off of centers passed
+        by signal emitter
+
+        :param centers: The list of button centers
+        :type centers: list[tuple(float,float)]
+        """
         self.button_centers = centers
         #for center in centers:
         #    print(center)
 
     @pyqtSlot()
     def calibrate(self):
+        """
+        Qt Slotted function to calibrate tracking mechanism based off of user
+        eye position
+        """
         self.center = self.pupil_avg
         self.x_scale_factor = math.floor(30000 / self.w) # 18600
         self.y_scale_factor = math.floor(30000 / self.w)
 
     def startProcessing(self):
+        """
+        Function called when this thread begins
+        """
         locker = QtCore.QMutexLocker(self.mutex)
 
         if not self.isRunning():
@@ -65,7 +86,12 @@ class TrackingThread(QtCore.QThread):
             self.condition.wakeOne()
 
     def findClosestCenter(self, cursor_pos):
-        """Used to figure out the closest button user is currently looking at"""
+        """
+        Finds the closest button center to the current mouse position
+
+        :param cursor_pos: The x,y position of the mouse cursor
+        :type cursor_pos: tuple (float,float)
+        """
         magnitude_vectors = []
         #Calculate vector between eye cursor and each button
         for center in self.button_centers:
@@ -105,14 +131,16 @@ class TrackingThread(QtCore.QThread):
             pyautogui.moveTo(position[0], position[1], 0.2)
 
     def findEyeCenter(self,gray_eye, thresh_eye):
-        """ findEyeCenter: approximates the center of the pupil by selecting
+        """ Approximates the center of the pupil by selecting
             the darkest point in gray_eye that is within the blob detected in
             thresh_eye
 
-            args:
-                - gray_eye: gray-scale image of eye
-                - thresh_eye: binary eye image with contours filled in"""
+            :param gray_eye: Gray-scale image of eye
+            :param thresh_eye: binary eye image with contours filled in
 
+            :return: The pixel location of pupil center
+            :rtype: tuple(int,int)
+        """
         dims = gray_eye.shape # get shape image
         minBlack = 300
         pupil = [0, 0]
@@ -129,9 +157,19 @@ class TrackingThread(QtCore.QThread):
 
     def getPupilAvgFromFace(self,gray_face, eyes, x, y, w, h):
         """
-        getPupilAvgFromFace(gray_face, eyes, x, y, w, h): Takes a grey version of face image,
-        a list of eyes, and the x, y, w, h, coordinates of the face. Returns a list [x, y] for
-        the average between the eyes contained in the list.
+        Takes a grey version of face image, a list of eyes, and the x, y, w, h,
+        coordinates of the face. Returns a list [x, y] for the average between
+        the eyes contained in the list.
+
+        :param gray_face: A gray-scale version of the face image
+        :param eyes: A list of eyes located within image
+        :param x: The x coordinate of the face
+        :param y: The y coordinate of the face
+        :param w: The width of the face
+        :param h: The height of the face
+
+        :return: The average center position of the eyes in the list
+        :rtype: tuple(int,int)
         """
         pupil_avg = [0,0]
         for (ex,ey,ew,eh) in eyes:
@@ -158,6 +196,10 @@ class TrackingThread(QtCore.QThread):
         return pupil_avg
 
     def run(self):
+        """
+        Called when this thread begins to run. Image processing done within
+        this function.
+        """
         self.request_button_centers.emit()
         while True:
             face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
