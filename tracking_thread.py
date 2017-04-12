@@ -21,6 +21,7 @@ class TrackingThread(QtCore.QThread):
         super(TrackingThread, self).__init__(parent)
 
         #Values required to run thread
+        self.found_face = False
         self.mutex = QtCore.QMutex()
         self.condition = QtCore.QWaitCondition()
         self.restart = False
@@ -200,7 +201,7 @@ class TrackingThread(QtCore.QThread):
         return pupil_avg
 
     def scale_position(self, x, y):
-        print ('Unscaled:', x, y)
+        #print ('Unscaled:', x, y)
         x_scaled = 1.*x * self.screen_x / self.cam_x
         y_scaled = 1.*y * self.screen_y / self.cam_y
         return x_scaled, y_scaled
@@ -249,15 +250,20 @@ class TrackingThread(QtCore.QThread):
                 if(img.size == 0):
                     continue
 
-                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                try:
+                    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-                # get faces
-                face_scale_factor = 1.3
-                face_min_neighbors = 3
-                (x,y,w,h) = face_cascade.detectMultiScale(img, face_scale_factor, face_min_neighbors)[0]
-                self.w = w
+                    # get faces
+                    face_scale_factor = 1.3
+                    face_min_neighbors = 3
+                    (x,y,w,h) = face_cascade.detectMultiScale(img, face_scale_factor, face_min_neighbors)[0]
+                    self.w = w
+                except:
+                    continue
 
                 break
+
+            self.found_face = True
 
             while(cap.isOpened()):
                 # pull video frame
@@ -343,7 +349,7 @@ class TrackingThread(QtCore.QThread):
 
                 #Move mouse cursor
                 pos_x, pos_y = self.scale_position(avgs[0], avgs[1])
-                print ('Position:', pos_x, pos_y)
+                #print ('Position:', pos_x, pos_y)
                 #self.findClosestCenter((pos_x, pos_y))
                 pyautogui.moveTo(pos_x, pos_y)
 
