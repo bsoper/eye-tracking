@@ -242,6 +242,8 @@ class UIWidget(QtWidgets.QWidget):
         txt = self.print_text.text()
         self.print_text.setText('Look here\nto calibrate.')
         self.print_text.setStyleSheet('color: red; font: bold 24pt')
+        while(not self.thread.found_face):
+            QtTest.QTest.qWait(1000)
         QtTest.QTest.qWait(3000)
         self.calibrate_pupil_centers.emit()
         self.print_text.setText('Calibrated')

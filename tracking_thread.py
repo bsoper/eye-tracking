@@ -21,6 +21,7 @@ class TrackingThread(QtCore.QThread):
         super(TrackingThread, self).__init__(parent)
 
         #Values required to run thread
+        self.found_face = False
         self.mutex = QtCore.QMutex()
         self.condition = QtCore.QWaitCondition()
         self.restart = False
@@ -38,6 +39,10 @@ class TrackingThread(QtCore.QThread):
         self.screen_x, self.screen_y = pyautogui.size()
         self.prev_pos = (0,0)
         self.num_new_pos = 0
+
+        # Camera and screen parameters
+        self.cam_x = 1280 #1920
+        self.cam_y = 720 #1080
 
     def __del__(self):
         """
@@ -195,6 +200,12 @@ class TrackingThread(QtCore.QThread):
 
         return pupil_avg
 
+    def scale_position(self, x, y):
+        #print ('Unscaled:', x, y)
+        x_scaled = 1.*x * self.screen_x / self.cam_x
+        y_scaled = 1.*y * self.screen_y / self.cam_y
+        return x_scaled, y_scaled
+
     def run(self):
         """
         Called when this thread begins to run. Image processing done within
@@ -225,9 +236,34 @@ class TrackingThread(QtCore.QThread):
             #center_count = 0
             #have_center = False
             #center = [0,0]
-            rolling_pupil_avg = collections.deque(maxlen=5)
+            
+            rolling_pupil_avg = collections.deque(maxlen=3)
             blink_count = 0
             frame_count = 0
+
+            while(True):
+                # pull video frame
+                ret, img = cap.read()
+                img = cv2.flip(img,1)
+
+                #Greyscale
+                if(img.size == 0):
+                    continue
+
+                try:
+                    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+                    # get faces
+                    face_scale_factor = 1.3
+                    face_min_neighbors = 3
+                    (x,y,w,h) = face_cascade.detectMultiScale(img, face_scale_factor, face_min_neighbors)[0]
+                    self.w = w
+                except:
+                    continue
+
+                break
+
+            self.found_face = True
 
             while(cap.isOpened()):
                 # pull video frame
@@ -239,115 +275,111 @@ class TrackingThread(QtCore.QThread):
                     continue
 
                 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                
+                # Pull face sub-image
+                gray_face = gray[y:y+h, x:x+w]
+                face = img[y:y+h, x:x+w]
 
-                # get faces
-                face_scale_factor = 1.3
-                face_min_neighbors = 5
-                faces = face_cascade.detectMultiScale(img, face_scale_factor, face_min_neighbors)
+                eyes = eye_cascade.detectMultiScale(gray_face, 3.0, 5) # locate eye regions
+                left_eye = left_eye_cascade.detectMultiScale(gray_face, 3.0, 5) # locate left eye regions
+                right_eye = right_eye_cascade.detectMultiScale(gray_face, 3.0, 5) # locate left eye regions
 
-                for (x,y,w,h) in faces:
-                    self.w = w
-                    # Pull face sub-image
-                    gray_face = gray[y:y+h, x:x+w]
-                    face = img[y:y+h, x:x+w]
-
-                    eyes = eye_cascade.detectMultiScale(gray_face, 3.0, 5) # locate eye regions
-                    left_eye = left_eye_cascade.detectMultiScale(gray_face, 3.0, 5) # locate left eye regions
-                    right_eye = right_eye_cascade.detectMultiScale(gray_face, 3.0, 5) # locate left eye regions
-
-                    # This ignores any frames where we have detected too few or too many eyes.
-                    # This generally won't filter out too many frames, as most detect eyes pretty well.
-                    # This is needed so we don't get bad data in our rolling averages.
-                    # Sometimes it will detect both eyes as right and left, so we just want to check if
-                    # it detected none, or more than two of each.
-                    if (len(left_eye) > 0 and len(left_eye) <= 2 and
-                        len(right_eye) > 0 and len(right_eye) <= 2):
-                        if len(eyes) == 0:
-                            blink_count += 1
-                            continue
-                        elif len(eyes) == 2:
-                            if blink_count >= 7:
-                                print('\nLong Blink', blink_count)
-                                pyautogui.click()
-                                blink_count = 0
-                            elif blink_count >= 2:
-                                print('\nBlink', blink_count)
-                                pyautogui.click()
-                                blink_count = 0
-                            else:
-                                blink_count = 0
-
-                    if len(eyes) != 2:
+                # This ignores any frames where we have detected too few or too many eyes.
+                # This generally won't filter out too many frames, as most detect eyes pretty well.
+                # This is needed so we don't get bad data in our rolling averages.
+                # Sometimes it will detect both eyes as right and left, so we just want to check if
+                # it detected none, or more than two of each.
+                if (len(left_eye) > 0 and len(left_eye) <= 2 and
+                    len(right_eye) > 0 and len(right_eye) <= 2):
+                    if len(eyes) == 0:
+                        blink_count += 1
                         continue
+                    elif len(eyes) == 2:
+                        if blink_count >= 7:
+                            print('\nLong Blink', blink_count)
+                            pyautogui.click()
+                            blink_count = 0
+                        elif blink_count >= 2:
+                            print('\nBlink', blink_count)
+                            pyautogui.click()
+                            blink_count = 0
+                        else:
+                            blink_count = 0
 
-                    # Uncomment to add boxes around face and eyes.
-                    cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
-                    color_face = img[y:y+h, x:x+w]
-                    for (ex,ey,ew,eh) in eyes:
-                        cv2.rectangle(color_face,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
+                if len(eyes) != 2:
+                    continue
 
-                    self.pupil_avg = self.getPupilAvgFromFace(gray_face, eyes, x, y, w, h)
-                    if self.center == None:
-                        self.calibrate()
+                # Uncomment to add boxes around face and eyes.
+                cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+                color_face = img[y:y+h, x:x+w]
+                for (ex,ey,ew,eh) in eyes:
+                    cv2.rectangle(color_face,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
 
-                    #if have_center == False:
-                    #    center = pupil_avg
-                    #    have_center = True
+                self.pupil_avg = self.getPupilAvgFromFace(gray_face, eyes, x, y, w, h)
+                if self.center == None:
+                    self.calibrate()
 
-                    # Highlight center.
-                    #if have_center:
-                    cv2.circle(img, (int(self.center[0]), int(self.center[1])), 2, (255,0,0), -1)
-                    x_scaled = self.center[0] + (self.pupil_avg[0] - self.center[0]) * self.x_scale_factor
-                    y_scaled = self.center[1] + (self.pupil_avg[1] - self.center[1]) * self.y_scale_factor
+                #if have_center == False:
+                #    center = pupil_avg
+                #    have_center = True
 
-                    rolling_pupil_avg.appendleft((x_scaled, y_scaled))
+                # Highlight center.
+                #if have_center:
+                cv2.circle(img, (int(self.center[0]), int(self.center[1])), 2, (255,0,0), -1)
+                x_scaled = self.center[0] + (self.pupil_avg[0] - self.center[0]) * self.x_scale_factor
+                y_scaled = self.center[1] + (self.pupil_avg[1] - self.center[1]) * self.y_scale_factor
 
-                    avgs = (sum(a) for a in zip(*rolling_pupil_avg))
-                    avgs = [a / len(rolling_pupil_avg) for a in avgs]
+                rolling_pupil_avg.appendleft((x_scaled, y_scaled))
 
-                    cv2.circle(img, (int(avgs[0]), int(avgs[1])), 5, (0,0,255), -1)
+                avgs = (sum(a) for a in zip(*rolling_pupil_avg))
+                avgs = [a / len(rolling_pupil_avg) for a in avgs]
 
-                    # Bound mouse position by edges of screen
-                    if avgs[0] < 0:
-                        avgs[0] = 0
-                    elif avgs[0] > self.screen_x:
-                        avgs[0] = self.screen_x
+                cv2.circle(img, (int(avgs[0]), int(avgs[1])), 5, (0,0,255), -1)
 
-                    if avgs[1] < 0:
-                        avgs[1] = 0
-                    elif avgs[1] > self.screen_y:
-                        avgs[1] = self.screen_y
+                # Bound mouse position by edges of screen
+                if avgs[0] < 0:
+                    avgs[0] = 0
+                elif avgs[0] > self.screen_x:
+                    avgs[0] = self.screen_x
 
-                    #Move mouse cursor
-                    self.findClosestCenter((avgs[0], avgs[1]))
-                    #pyautogui.moveTo(avgs[0], avgs[1])
+                if avgs[1] < 0:
+                    avgs[1] = 0
+                elif avgs[1] > self.screen_y:
+                    avgs[1] = self.screen_y
 
-                    #pyautogui.moveTo(self.center[0], self.center[1])
+                #Move mouse cursor
+                #pos_x, pos_y = self.scale_position(avgs[0], avgs[1])
+                #print ('Position:', pos_x, pos_y)
+                #self.findClosestCenter((pos_x, pos_y))
+                self.findClosestCenter((avgs[0], avgs[1]))
+                #pyautogui.moveTo(pos_x, pos_y)
+
+                #pyautogui.moveTo(self.center[0], self.center[1])
 
 
-                    #if avgs[0] - center[0] < -200:
-                        #pyautogui.moveTo(200, 500)
-                        #print('Left')
-                    #elif avgs[0] - center[0] > 200:
-                        #pyautogui.moveTo(1200, 500)
-                        #print('Right')
+                #if avgs[0] - center[0] < -200:
+                    #pyautogui.moveTo(200, 500)
+                    #print('Left')
+                #elif avgs[0] - center[0] > 200:
+                    #pyautogui.moveTo(1200, 500)
+                    #print('Right')
 
-                    #Move mouse cursor freely
-                    #pyautogui.moveTo(avgs[0], avgs[1])
+                #Move mouse cursor freely
+                #pyautogui.moveTo(avgs[0], avgs[1])
 
-                    #Snap cursor to set locations
-                    #if avgs[0] - self.center[0] < -200:
-                    #    pyautogui.moveTo(200, 500)
-                    #elif avgs[0] - self.center[0] > 200:
-                    #    pyautogui.moveTo(1200, 500)
+                #Snap cursor to set locations
+                #if avgs[0] - self.center[0] < -200:
+                #    pyautogui.moveTo(200, 500)
+                #elif avgs[0] - self.center[0] > 200:
+                #    pyautogui.moveTo(1200, 500)
 
-                    # Uncomment to see location without averaging
-                    #cv2.circle(img, (x_scaled, y_scaled), 5, (255,0,255), -1)
+                # Uncomment to see location without averaging
+                #cv2.circle(img, (x_scaled, y_scaled), 5, (255,0,255), -1)
 
-                    # Uncomment to show unscaled movement of average.
-                    #x = self.center[0] + (self.pupil_avg[0] - self.center[0])
-                    #y = self.center[1] + (self.pupil_avg[1] - self.center[1])
-                    #cv2.circle(img, (x, y), 2, (0,255,0), -1)
+                # Uncomment to show unscaled movement of average.
+                #x = self.center[0] + (self.pupil_avg[0] - self.center[0])
+                #y = self.center[1] + (self.pupil_avg[1] - self.center[1])
+                #cv2.circle(img, (x, y), 2, (0,255,0), -1)
 
                 #cv2.imshow('frame', img)
 
