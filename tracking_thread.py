@@ -41,8 +41,8 @@ class TrackingThread(QtCore.QThread):
         self.num_new_pos = 0
 
         # Camera and screen parameters
-        self.cam_x = 1920
-        self.cam_y = 1080
+        self.cam_x = 1280 #1920
+        self.cam_y = 720 #1080
 
     def __del__(self):
         """
@@ -348,10 +348,11 @@ class TrackingThread(QtCore.QThread):
                     avgs[1] = self.screen_y
 
                 #Move mouse cursor
-                pos_x, pos_y = self.scale_position(avgs[0], avgs[1])
+                #pos_x, pos_y = self.scale_position(avgs[0], avgs[1])
                 #print ('Position:', pos_x, pos_y)
                 #self.findClosestCenter((pos_x, pos_y))
-                pyautogui.moveTo(pos_x, pos_y)
+                self.findClosestCenter((avgs[0], avgs[1]))
+                #pyautogui.moveTo(pos_x, pos_y)
 
                 #pyautogui.moveTo(self.center[0], self.center[1])
 
