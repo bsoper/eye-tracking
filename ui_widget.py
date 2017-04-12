@@ -158,7 +158,7 @@ class UIWidget(QtWidgets.QWidget):
             self.setPrevMenu("Letters")
 
         if(button_content == "F-J"):
-            self.setMenuButtonConent("F","G","H","I","Back","J")
+            self.setMenuButtonContent("F","G","H","I","Back","J")
             self.setPrevMenu("Letters")
 
         if(button_content == "K-O"):
