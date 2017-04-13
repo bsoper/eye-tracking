@@ -61,7 +61,9 @@ class CustomButton(QtWidgets.QPushButton):
         based off of the buttons self.button_content
         """
         menu_options = ["A-E", "F-J","K-O","P-T","U-Z","X,Z","Numbers",
-                        "Letters","Phrases","0-4","5-9"]
+                        "Letters","Phrases","0-4","5-9","Punctuation",
+                        "Symbols","Additional Symbols","Greetings",
+                        "Responses","Emotions"]
 
         if self.content in menu_options:
             self.change_menu_options.emit(str(self.content))

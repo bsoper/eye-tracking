@@ -179,7 +179,8 @@ class UIWidget(QtWidgets.QWidget):
             self.setPrevMenu("U-Z")
 
         if(button_content == "Numbers"):
-            self.setMenuButtonContent("0-4","5-9","","","Back","")
+            self.setMenuButtonContent("0-4","5-9","Punctuation","Symbols","Back",
+            "Additional Symbols")
             self.setPrevMenu("main")
 
         if(button_content == "0-4"):
@@ -189,6 +190,38 @@ class UIWidget(QtWidgets.QWidget):
         if(button_content == "5-9"):
             self.setMenuButtonContent('5','6','7','8','Back','9')
             self.setPrevMenu("Numbers")
+
+        if(button_content == "Punctuation"):
+            self.setMenuButtonContent('. ',', ','! ','? ','Back','"')
+            self.setPrevMenu("Numbers")
+
+        if(button_content == "Symbols"):
+            self.setMenuButtonContent('@','#','$','%','Back','&')
+            self.setPrevMenu("Numbers")
+
+        if(button_content == "Additional Symbols"):
+            self.setMenuButtonContent('(',')','/','*','Back','-')
+            self.setPrevMenu('Numbers')
+
+        if(button_content == "Phrases"):
+            self.setMenuButtonContent('Greetings','Emotions','Responses',
+                    '','Back','')
+            self.setPrevMenu('main')
+
+        if(button_content == "Greetings"):
+            self.setMenuButtonContent('Hello','Good Morning','Good Afternoon',
+                    'Goodnight', 'Back', 'Goodbye')
+            self.setPrevMenu('Phrases')
+
+        if(button_content == "Emotions"):
+            self.setMenuButtonContent('Good','Bad','Happy','Sad','Back','Angry')
+            self.setPrevMenu('Phrases')
+
+        if(button_content == "Responses"):
+            self.setMenuButtonContent('Yes', 'I Don\'t know', 'No','Okay',
+                    'Back','Thank You')
+            self.setPrevMenu('Phrases')
+
 
     @pyqtSlot(str)
     def appendText(self, val):
