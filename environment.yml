@@ -1,0 +1,130 @@
+name: eye_tracking
+channels:
+- !!python/unicode
+  'https://conda.binstar.org/menpo'
+- !!python/unicode
+  'jlaura'
+- !!python/unicode
+  'defaults'
+dependencies:
+- !!python/unicode
+  'hdf5=1.8.17=1'
+- !!python/unicode
+  'mkl=2017.0.1=0'
+- !!python/unicode
+  'numpy=1.11.3=py35_0'
+- !!python/unicode
+  'openssl=1.0.2k=0'
+- !!python/unicode
+  'pip=9.0.1=py35_1'
+- !!python/unicode
+  'python=3.5.2=0'
+- !!python/unicode
+  'readline=6.2=2'
+- !!python/unicode
+  'setuptools=27.2.0=py35_0'
+- !!python/unicode
+  'sqlite=3.13.0=0'
+- !!python/unicode
+  'tk=8.5.18=0'
+- !!python/unicode
+  'wheel=0.29.0=py35_0'
+- !!python/unicode
+  'xz=5.2.2=1'
+- !!python/unicode
+  'zlib=1.2.8=3'
+- !!python/unicode
+  'tbb=4.3_20141023=0'
+- !!python/unicode
+  'opencv3=3.0.0=py35_0'
+- pip:
+  - appdirs==1.4.3
+  - asn1crypto==0.22.0
+  - cffi==1.10.0
+  - cryptography==1.8.1
+  - gtts==1.1.8
+  - gtts-token==1.1.1
+  - idna==2.5
+  - olefile==0.44
+  - packaging==16.8
+  - pillow==4.0.0
+  - pyautogui==0.9.35
+  - pycparser==2.17
+  - pymsgbox==1.0.6
+  - pyobjc==3.2.1
+  - pyobjc-core==3.2.1
+  - pyobjc-framework-accounts==3.2.1
+  - pyobjc-framework-addressbook==3.2.1
+  - pyobjc-framework-applescriptkit==3.2.1
+  - pyobjc-framework-applescriptobjc==3.2.1
+  - pyobjc-framework-applicationservices==3.2.1
+  - pyobjc-framework-automator==3.2.1
+  - pyobjc-framework-avfoundation==3.2.1
+  - pyobjc-framework-avkit==3.2.1
+  - pyobjc-framework-calendarstore==3.2.1
+  - pyobjc-framework-cfnetwork==3.2.1
+  - pyobjc-framework-cloudkit==3.2.1
+  - pyobjc-framework-cocoa==3.2.1
+  - pyobjc-framework-collaboration==3.2.1
+  - pyobjc-framework-contacts==3.2.1
+  - pyobjc-framework-contactsui==3.2.1
+  - pyobjc-framework-corebluetooth==3.2.1
+  - pyobjc-framework-coredata==3.2.1
+  - pyobjc-framework-corelocation==3.2.1
+  - pyobjc-framework-coretext==3.2.1
+  - pyobjc-framework-corewlan==3.2.1
+  - pyobjc-framework-cryptotokenkit==3.2.1
+  - pyobjc-framework-dictionaryservices==3.2.1
+  - pyobjc-framework-diskarbitration==3.2.1
+  - pyobjc-framework-eventkit==3.2.1
+  - pyobjc-framework-exceptionhandling==3.2.1
+  - pyobjc-framework-findersync==3.2.1
+  - pyobjc-framework-fsevents==3.2.1
+  - pyobjc-framework-gamecenter==3.2.1
+  - pyobjc-framework-gamecontroller==3.2.1
+  - pyobjc-framework-imagecapturecore==3.2.1
+  - pyobjc-framework-imserviceplugin==3.2.1
+  - pyobjc-framework-inputmethodkit==3.2.1
+  - pyobjc-framework-installerplugins==3.2.1
+  - pyobjc-framework-instantmessage==3.2.1
+  - pyobjc-framework-iosurface==3.2.1
+  - pyobjc-framework-latentsemanticmapping==3.2.1
+  - pyobjc-framework-launchservices==3.2.1
+  - pyobjc-framework-localauthentication==3.2.1
+  - pyobjc-framework-mapkit==3.2.1
+  - pyobjc-framework-mediaaccessibility==3.2.1
+  - pyobjc-framework-medialibrary==3.2.1
+  - pyobjc-framework-modelio==3.2.1
+  - pyobjc-framework-multipeerconnectivity==3.2.1
+  - pyobjc-framework-netfs==3.2.1
+  - pyobjc-framework-networkextension==3.2.1
+  - pyobjc-framework-notificationcenter==3.2.1
+  - pyobjc-framework-opendirectory==3.2.1
+  - pyobjc-framework-photos==3.2.1
+  - pyobjc-framework-photosui==3.2.1
+  - pyobjc-framework-preferencepanes==3.2.1
+  - pyobjc-framework-pubsub==3.2.1
+  - pyobjc-framework-qtkit==3.2.1
+  - pyobjc-framework-quartz==3.2.1
+  - pyobjc-framework-safariservices==3.2.1
+  - pyobjc-framework-scenekit==3.2.1
+  - pyobjc-framework-screensaver==3.2.1
+  - pyobjc-framework-scriptingbridge==3.2.1
+  - pyobjc-framework-searchkit==3.2.1
+  - pyobjc-framework-servicemanagement==3.2.1
+  - pyobjc-framework-social==3.2.1
+  - pyobjc-framework-spritekit==3.2.1
+  - pyobjc-framework-storekit==3.2.1
+  - pyobjc-framework-syncservices==3.2.1
+  - pyobjc-framework-systemconfiguration==3.2.1
+  - pyobjc-framework-webkit==3.2.1
+  - pyopenssl==16.2.0
+  - pyparsing==2.2.0
+  - pyqt5==5.8
+  - pyscreeze==0.1.9
+  - pytweening==1.0.3
+  - requests==2.13.0
+  - sip==4.19.1
+  - six==1.10.0
+prefix: !!python/unicode '/Users/bsoper/anaconda/envs/eye_tracking'
+
