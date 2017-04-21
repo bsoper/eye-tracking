@@ -209,17 +209,17 @@ class UIWidget(QtWidgets.QWidget):
             self.setPrevMenu('main')
 
         if(button_content == "Greetings"):
-            self.setMenuButtonContent('Hello','Good Morning','Good Afternoon',
-                    'Goodnight', 'Back', 'Goodbye')
+            self.setMenuButtonContent('Hello ','Good Morning ','Good Afternoon ',
+                    'Goodnight ', 'Back', 'Goodbye ')
             self.setPrevMenu('Phrases')
 
         if(button_content == "Emotions"):
-            self.setMenuButtonContent('Good','Bad','Happy','Sad','Back','Angry')
+            self.setMenuButtonContent('Good ','Bad ','Happy ','Sad ','Back','Angry ')
             self.setPrevMenu('Phrases')
 
         if(button_content == "Responses"):
-            self.setMenuButtonContent('Yes', 'I Don\'t know', 'No','Okay',
-                    'Back','Thank You')
+            self.setMenuButtonContent('Yes ', 'I Don\'t know ', 'No ','Okay ',
+                    'Back','Thank You ')
             self.setPrevMenu('Phrases')
 
 
@@ -233,7 +233,7 @@ class UIWidget(QtWidgets.QWidget):
         if(val == 'Space'):
             val = " "
         text = self.print_text.text() + val
-        self.print_text.setText(text)
+        self.print_text.setText(text.upper())
 
     @pyqtSlot()
     def backspace(self):
@@ -281,7 +281,7 @@ class UIWidget(QtWidgets.QWidget):
         self.calibrate_pupil_centers.emit()
         self.print_text.setText('Calibrated')
         QtTest.QTest.qWait(1000)
-        self.print_text.setStyleSheet('color: black; font: 20pt')
+        self.print_text.setStyleSheet('color: black; font: 36pt')
         self.print_text.setText(txt)
 
     def setPrevMenu(self, prev_menu):

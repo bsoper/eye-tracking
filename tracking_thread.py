@@ -41,8 +41,8 @@ class TrackingThread(QtCore.QThread):
         self.num_new_pos = 0
 
         # Camera and screen parameters
-        self.cam_x = 1280 #1920
-        self.cam_y = 720 #1080
+        self.cam_x = 1920
+        self.cam_y = 1080
 
     def __del__(self):
         """
@@ -65,8 +65,6 @@ class TrackingThread(QtCore.QThread):
         :type centers: list[tuple(float,float)]
         """
         self.button_centers = centers
-        #for center in centers:
-        #    print(center)
 
     @pyqtSlot()
     def calibrate(self):
@@ -129,11 +127,8 @@ class TrackingThread(QtCore.QThread):
             self.prev_pos = position
             self.num_new_pos = 0
 
-            #Emit signal to tell gui thread to move cursor
-            #self.move_cursor_to_button.emit(closest_entry[1])
-            #self.move_cursor_to_button.emit(cursor_pos)
-            #self.move_cursor_to_button.emit(position)
-            pyautogui.moveTo(position[0], position[1], 0.2)
+        #Move mouse to a the button position.
+        pyautogui.moveTo(position[0], position[1], 0.2)
 
     def findEyeCenter(self,gray_eye, thresh_eye):
         """ Approximates the center of the pupil by selecting
@@ -179,14 +174,12 @@ class TrackingThread(QtCore.QThread):
         pupil_avg = [0,0]
         for (ex,ey,ew,eh) in eyes:
             gray_eye = gray_face[ey:ey+eh, ex:ex+ew] # get eye
-            #eye = face[ey:ey+eh, ex:ex+ew]
 
             # apply gaussian blur to image
             blur = cv2.GaussianBlur(gray_eye, (15,15), 3*gray_eye.shape[0])
             retval, thresh = cv2.threshold(~blur, 150, 255, cv2.THRESH_BINARY)
             _,contours, hierarchy = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             cv2.drawContours(thresh, contours, -1, (255, 255, 255), -1)
-            #circles = cv2.HoughCircles(thresh, cv2.cv.CV_HOUGH_GRADIENT, 1, 1)
             pupil = self.findEyeCenter(gray_eye, thresh)
 
             # Uncomment to highlight individual pupils.
@@ -201,7 +194,9 @@ class TrackingThread(QtCore.QThread):
         return pupil_avg
 
     def scale_position(self, x, y):
-        #print ('Unscaled:', x, y)
+        """
+        Called to scale the position based on the resolution of the webcam.
+        """
         x_scaled = 1.*x * self.screen_x / self.cam_x
         y_scaled = 1.*y * self.screen_y / self.cam_y
         return x_scaled, y_scaled
@@ -230,12 +225,8 @@ class TrackingThread(QtCore.QThread):
             if right_eye_cascade.empty():
                 print("did not load right eye classifier.")
 
-            #cap = cv2.videocapture('/users/bsoper/movies/eye_tracking/cal_1.mov')
+            # The value passed to VideoCapture relates to the camera number for the OS
             cap = cv2.VideoCapture(0)
-
-            #center_count = 0
-            #have_center = False
-            #center = [0,0]
             
             rolling_pupil_avg = collections.deque(maxlen=3)
             blink_count = 0
@@ -259,6 +250,7 @@ class TrackingThread(QtCore.QThread):
                     (x,y,w,h) = face_cascade.detectMultiScale(img, face_scale_factor, face_min_neighbors)[0]
                     self.w = w
                 except:
+                    # If for some reason, you don't detect a face, try the next frame.
                     continue
 
                 break
@@ -295,17 +287,18 @@ class TrackingThread(QtCore.QThread):
                         blink_count += 1
                         continue
                     elif len(eyes) == 2:
+                        # Long blinks are not currently used, but this could be used.
+                        # Blinks look for the number of frames where eyes are detected but not open eyes.
                         if blink_count >= 7:
-                            print('\nLong Blink', blink_count)
                             pyautogui.click()
                             blink_count = 0
                         elif blink_count >= 2:
-                            print('\nBlink', blink_count)
                             pyautogui.click()
                             blink_count = 0
                         else:
                             blink_count = 0
 
+                # Ensure that two eyes have been detected.
                 if len(eyes) != 2:
                     continue
 
@@ -318,10 +311,6 @@ class TrackingThread(QtCore.QThread):
                 self.pupil_avg = self.getPupilAvgFromFace(gray_face, eyes, x, y, w, h)
                 if self.center == None:
                     self.calibrate()
-
-                #if have_center == False:
-                #    center = pupil_avg
-                #    have_center = True
 
                 # Highlight center.
                 #if have_center:
@@ -348,48 +337,10 @@ class TrackingThread(QtCore.QThread):
                     avgs[1] = self.screen_y
 
                 #Move mouse cursor
+                # Uncomment this like to scale the positions when using a webcam.
                 #pos_x, pos_y = self.scale_position(avgs[0], avgs[1])
-                #print ('Position:', pos_x, pos_y)
-                #self.findClosestCenter((pos_x, pos_y))
-                self.findClosestCenter((avgs[0], avgs[1]))
+
+                pos_x, pos_y = avgs[0], avgs[1]
+                # Switch the comments on these two lines to give free movement of the mouse.
+                self.findClosestCenter((pos_x, pos_y))
                 #pyautogui.moveTo(pos_x, pos_y)
-
-                #pyautogui.moveTo(self.center[0], self.center[1])
-
-
-                #if avgs[0] - center[0] < -200:
-                    #pyautogui.moveTo(200, 500)
-                    #print('Left')
-                #elif avgs[0] - center[0] > 200:
-                    #pyautogui.moveTo(1200, 500)
-                    #print('Right')
-
-                #Move mouse cursor freely
-                #pyautogui.moveTo(avgs[0], avgs[1])
-
-                #Snap cursor to set locations
-                #if avgs[0] - self.center[0] < -200:
-                #    pyautogui.moveTo(200, 500)
-                #elif avgs[0] - self.center[0] > 200:
-                #    pyautogui.moveTo(1200, 500)
-
-                # Uncomment to see location without averaging
-                #cv2.circle(img, (x_scaled, y_scaled), 5, (255,0,255), -1)
-
-                # Uncomment to show unscaled movement of average.
-                #x = self.center[0] + (self.pupil_avg[0] - self.center[0])
-                #y = self.center[1] + (self.pupil_avg[1] - self.center[1])
-                #cv2.circle(img, (x, y), 2, (0,255,0), -1)
-
-                #cv2.imshow('frame', img)
-
-                #Mutex stuff
-                #self.mutex.lock()
-                #if not self.restart:
-                #    self.condition.wait(self.mutex)
-                #self.restart = False
-                #self.mutex.unlock()
-
-            # cleanup
-            #cap.release()
-            #cv2.destroyAllWindows()
