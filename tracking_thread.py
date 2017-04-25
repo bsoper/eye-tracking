@@ -72,6 +72,9 @@ class TrackingThread(QtCore.QThread):
         Qt Slotted function to calibrate tracking mechanism based off of user
         eye position
         """
+        # The multiplier used in the scaling factors are fairly arbitrary. This
+        # gave us good results, but is something that should be available for
+        # the user to change.
         self.center = self.pupil_avg
         self.x_scale_factor = math.floor(30000 / self.w) # 18600
         self.y_scale_factor = math.floor(30000 / self.w)
@@ -181,9 +184,6 @@ class TrackingThread(QtCore.QThread):
             _,contours, hierarchy = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             cv2.drawContours(thresh, contours, -1, (255, 255, 255), -1)
             pupil = self.findEyeCenter(gray_eye, thresh)
-
-            # Uncomment to highlight individual pupils.
-            cv2.circle(gray_face, (int(pupil[1] + ex + x), int(pupil[0] + ey + y)), 2, (0,255,0), -1)
 
             pupil_avg[0] += pupil[1] + ex + x;
             pupil_avg[1] += pupil[0] + ey + y;
@@ -302,19 +302,10 @@ class TrackingThread(QtCore.QThread):
                 if len(eyes) != 2:
                     continue
 
-                # Uncomment to add boxes around face and eyes.
-                cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
-                color_face = img[y:y+h, x:x+w]
-                for (ex,ey,ew,eh) in eyes:
-                    cv2.rectangle(color_face,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
-
                 self.pupil_avg = self.getPupilAvgFromFace(gray_face, eyes, x, y, w, h)
                 if self.center == None:
                     self.calibrate()
 
-                # Highlight center.
-                #if have_center:
-                cv2.circle(img, (int(self.center[0]), int(self.center[1])), 2, (255,0,0), -1)
                 x_scaled = self.center[0] + (self.pupil_avg[0] - self.center[0]) * self.x_scale_factor
                 y_scaled = self.center[1] + (self.pupil_avg[1] - self.center[1]) * self.y_scale_factor
 
@@ -322,8 +313,6 @@ class TrackingThread(QtCore.QThread):
 
                 avgs = (sum(a) for a in zip(*rolling_pupil_avg))
                 avgs = [a / len(rolling_pupil_avg) for a in avgs]
-
-                cv2.circle(img, (int(avgs[0]), int(avgs[1])), 5, (0,0,255), -1)
 
                 # Bound mouse position by edges of screen
                 if avgs[0] < 0:
@@ -337,10 +326,10 @@ class TrackingThread(QtCore.QThread):
                     avgs[1] = self.screen_y
 
                 #Move mouse cursor
+                pos_x, pos_y = avgs[0], avgs[1]
                 # Uncomment this like to scale the positions when using a webcam.
                 #pos_x, pos_y = self.scale_position(avgs[0], avgs[1])
 
-                pos_x, pos_y = avgs[0], avgs[1]
                 # Switch the comments on these two lines to give free movement of the mouse.
                 self.findClosestCenter((pos_x, pos_y))
                 #pyautogui.moveTo(pos_x, pos_y)
